@@ -1,0 +1,77 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ArmorPiece {
+  armorSet: String!
+  defense: Float!
+  description: String
+  id: ID!
+  name: String!
+  rarity: Float!
+  type: String!
+}
+
+type Item {
+  category: String!
+  description: String
+  id: ID!
+  name: String!
+  rarity: Float!
+  value: Float!
+}
+
+type Monster {
+  description: String
+  elements: [String!]!
+  habitat: String
+  iconUrl: String
+  id: ID!
+  imageUrl: String
+  locations: [String!]!
+  name: String!
+  rewards: [MonsterReward!]!
+  species: String!
+  threatLevel: Int!
+  weaknesses: [String!]!
+}
+
+type MonsterReward {
+  dropRate: Int!
+  itemName: String!
+  method: String!
+  rank: String
+}
+
+type Query {
+  armorPiece(id: ID!): ArmorPiece
+  armorPieces: [ArmorPiece!]!
+  armorPiecesByRarity(rarity: Int!): [ArmorPiece!]!
+  armorPiecesBySet(armorSet: String!): [ArmorPiece!]!
+  armorPiecesByType(type: String!): [ArmorPiece!]!
+  item(id: ID!): Item
+  items: [Item!]!
+  itemsByCategory(category: String!): [Item!]!
+  itemsByRarity(rarity: Int!): [Item!]!
+  monster(id: ID!): Monster
+  monsters: [Monster!]!
+  monstersByLocation(location: String!): [Monster!]!
+  monstersBySpecies(species: String!): [Monster!]!
+  monstersByThreatLevel(level: Int!): [Monster!]!
+  searchItems(name: String!): [Item!]!
+  weapon(id: ID!): Weapon
+  weapons: [Weapon!]!
+  weaponsByElement(element: String!): [Weapon!]!
+  weaponsByRarity(rarity: Int!): [Weapon!]!
+  weaponsByType(type: String!): [Weapon!]!
+}
+
+type Weapon {
+  attack: Float!
+  description: String
+  element: String
+  id: ID!
+  name: String!
+  rarity: Float!
+  type: String!
+}

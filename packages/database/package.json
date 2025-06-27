@@ -1,5 +1,5 @@
 {
-  "name": "@mhw2wiki/database",
+  "name": "@mhwildswiki/database",
   "version": "0.2.0",
   "private": true,
   "description": "MHW2Wiki 数据库层 - Prisma Schema 和数据导入",

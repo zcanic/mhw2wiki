@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * MHW2Wiki 数据更新脚本 v1.0
+ * MHWildsWiki 数据更新脚本 v1.0
  * 
  * 专门用于数据更新场景，只需更新 output/merged/ 目录下的 JSON 文件
  * 支持增量更新和全量更新两种模式
@@ -306,7 +306,7 @@ async function main(): Promise<void> {
   const totalStartTime = performance.now();
   
   try {
-    logger.info('🚀 开始 MHW2Wiki 数据更新...');
+    logger.info('🚀 开始 MHWildsWiki 数据更新...');
     
     // 1. 检查 output/merged/ 目录
     if (!existsSync(DATA_PATH)) {

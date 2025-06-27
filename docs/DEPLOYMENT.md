@@ -1,4 +1,4 @@
-# MHW2Wiki 部署运维指南
+# MHWildsWiki 部署运维指南
 
 ## 🎯 部署环境说明
 

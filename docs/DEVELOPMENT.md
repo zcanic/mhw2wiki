@@ -1,4 +1,4 @@
-# MHW2Wiki 开发指南
+# MHWildsWiki 开发指南
 
 ## 🎯 开发环境设置
 
@@ -98,7 +98,7 @@ test(api): add integration tests for monster endpoints
 #### ESLint 配置
 ```json
 {
-  "extends": ["@mhw2wiki/eslint-config"],
+  "extends": ["@mhwildswiki/eslint-config"],
   "rules": {
     "import/no-unresolved": "error",
     "@typescript-eslint/no-unused-vars": "error",
@@ -709,4 +709,4 @@ export const config = configSchema.parse(process.env);
 
 ---
 
-*本开发指南涵盖了 MHW2Wiki 项目的完整开发流程，确保代码质量、性能和可维护性。*
+*本开发指南涵盖了 MHWildsWiki 项目的完整开发流程，确保代码质量、性能和可维护性。*

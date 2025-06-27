@@ -1,5 +1,5 @@
 {
-  "name": "@mhw2wiki/ui",
+  "name": "@mhwildswiki/ui",
   "version": "0.1.0",
   "private": true,
   "exports": {
@@ -11,8 +11,8 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@mhw2wiki/eslint-config": "*",
-    "@mhw2wiki/typescript-config": "*",
+    "@mhwildswiki/eslint-config": "*",
+    "@mhwildswiki/typescript-config": "*",
     "@turbo/gen": "^2.5.0",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",

@@ -42,3 +42,12 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Database files
+*.db
+*.db-journal
+packages/database/prisma/dev.db*
+
+# Generated files with spaces or duplicates
+*" 2."*
+*" 3."*

@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * MHW2Wiki 数据导入脚本 v3.1
+ * MHWildsWiki 数据导入脚本 v3.1
  * 
  * 重构优化版本：更高效的清理、严格类型、错误恢复
  * 支持并行导入、详细日志、幂等操作
@@ -561,7 +561,7 @@ async function main(): Promise<void> {
   const globalStats: Record<string, ImportStats> = {};
   
   try {
-    logger.info('🚀 开始 MHW2Wiki 数据导入...');
+    logger.info('🚀 开始 MHWildsWiki 数据导入...');
     
     // 1. 清理数据库
     await clearDatabase();

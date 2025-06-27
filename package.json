@@ -1,5 +1,5 @@
 {
-  "name": "mhw2wiki",
+  "name": "mhwildswiki",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -18,9 +18,5 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@10.9.2",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "packageManager": "pnpm@8.15.0"
 }

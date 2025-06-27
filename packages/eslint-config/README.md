@@ -1,6 +1,6 @@
-# `@mhw2wiki/eslint-config`
+# `@mhwildswiki/eslint-config`
 
-MHW2Wiki 项目的 ESLint 配置包。
+MHWildsWiki 项目的 ESLint 配置包。
 
 ## 包含配置
 
@@ -13,7 +13,7 @@ MHW2Wiki 项目的 ESLint 配置包。
 ```js
 // 在项目的 .eslintrc.js 或 eslint.config.js 中
 module.exports = {
-  extends: ["@mhw2wiki/eslint-config/base"],
+  extends: ["@mhwildswiki/eslint-config/base"],
   // 或其他配置
 };
 ```

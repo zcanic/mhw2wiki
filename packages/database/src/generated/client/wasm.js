@@ -116,208 +116,62 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
-exports.Prisma.ItemScalarFieldEnum = {
+exports.Prisma.LargeMonsterScalarFieldEnum = {
   id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  descriptions: 'descriptions',
-  kind: 'kind',
-  rarity: 'rarity',
-  max_count: 'max_count',
-  sell_price: 'sell_price',
-  buy_price: 'buy_price',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  gameId: 'gameId',
+  nameEn: 'nameEn',
+  nameJa: 'nameJa',
+  nameZh: 'nameZh',
+  monsterType: 'monsterType',
+  threatLevel: 'threatLevel',
+  elements: 'elements',
+  weaknesses: 'weaknesses',
+  iconUrl: 'iconUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SkillScalarFieldEnum = {
+exports.Prisma.WeaponScalarFieldEnum = {
   id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  descriptions: 'descriptions',
-  ranks: 'ranks',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  gameId: 'gameId',
+  nameEn: 'nameEn',
+  nameJa: 'nameJa',
+  nameZh: 'nameZh',
+  weaponType: 'weaponType',
+  rarity: 'rarity',
+  attack: 'attack',
+  elementType: 'elementType',
+  elementDamage: 'elementDamage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ItemScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  nameEn: 'nameEn',
+  nameJa: 'nameJa',
+  nameZh: 'nameZh',
+  category: 'category',
+  rarity: 'rarity',
+  value: 'value',
+  iconUrl: 'iconUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MonsterScalarFieldEnum = {
   id: 'id',
   game_id: 'game_id',
-  names: 'names',
-  descriptions: 'descriptions',
-  features: 'features',
-  species: 'species',
-  parts: 'parts',
-  rewards: 'rewards',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.ArmorSetScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  rarity: 'rarity',
-  set_bonus: 'set_bonus',
-  group_bonus: 'group_bonus',
-  pieces: 'pieces',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.AmuletScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  ranks: 'ranks',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.AccessoryScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  descriptions: 'descriptions',
-  rarity: 'rarity',
-  price: 'price',
-  level: 'level',
-  skills: 'skills',
-  allowed_on: 'allowed_on',
-  icon_color: 'icon_color',
-  icon_color_id: 'icon_color_id',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.CharmScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.WeaponSeriesScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.WeaponScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  kind: 'kind',
-  names: 'names',
-  descriptions: 'descriptions',
-  rarity: 'rarity',
-  attack_raw: 'attack_raw',
-  affinity: 'affinity',
-  defense: 'defense',
-  slots: 'slots',
-  sharpness: 'sharpness',
-  handicraft: 'handicraft',
-  element_type: 'element_type',
-  element_damage: 'element_damage',
-  element_hidden: 'element_hidden',
-  ammo: 'ammo',
-  coatings: 'coatings',
-  charge_levels: 'charge_levels',
-  melodies: 'melodies',
-  songs: 'songs',
-  kinsect_bonus: 'kinsect_bonus',
-  crafting_cost: 'crafting_cost',
-  upgrade_cost: 'upgrade_cost',
-  materials: 'materials',
-  series_id: 'series_id',
-  previous_id: 'previous_id',
-  next_weapons: 'next_weapons',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.ArmorUpgradeScalarFieldEnum = {
-  id: 'id',
-  rarity: 'rarity',
-  steps: 'steps',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.SpeciesScalarFieldEnum = {
-  id: 'id',
-  kind: 'kind',
-  names: 'names',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.StageScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  areas: 'areas',
-  camps: 'camps',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.HuntingHornMelodyScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  notes: 'notes',
-  songs: 'songs',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.HuntingHornSongScalarFieldEnum = {
-  id: 'id',
-  effect_id: 'effect_id',
-  notes: 'notes',
-  names: 'names',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.PartNameScalarFieldEnum = {
-  id: 'id',
-  game_id: 'game_id',
-  names: 'names',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  data: 'data'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
-};
-
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -327,21 +181,10 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Item: 'Item',
-  Skill: 'Skill',
-  Monster: 'Monster',
-  ArmorSet: 'ArmorSet',
-  Amulet: 'Amulet',
-  Accessory: 'Accessory',
-  Charm: 'Charm',
-  WeaponSeries: 'WeaponSeries',
+  LargeMonster: 'LargeMonster',
   Weapon: 'Weapon',
-  ArmorUpgrade: 'ArmorUpgrade',
-  Species: 'Species',
-  Stage: 'Stage',
-  HuntingHornMelody: 'HuntingHornMelody',
-  HuntingHornSong: 'HuntingHornSong',
-  PartName: 'PartName'
+  Item: 'Item',
+  Monster: 'Monster'
 };
 
 /**

@@ -1,0 +1,21 @@
+{
+  "extends": "../typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*",
+    "scripts/**/*",
+    "prisma/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/generated"
+  ]
+}

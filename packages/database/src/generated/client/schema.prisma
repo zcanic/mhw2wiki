@@ -1,265 +1,71 @@
-// MHW2Wiki - Monster Hunter World 2 Data Schema
-// 优化后的数据库架构设计，完全适配 output/merged/ 数据结构
-
+// MHWildsWiki - SQLite Compatible Schema v1.0
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/client"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// 核心实体模型 - 完全基于实际数据结构设计
+model LargeMonster {
+  id          Int      @id @default(autoincrement())
+  gameId      String   @unique @map("game_id")
+  nameEn      String   @map("name_en")
+  nameJa      String   @map("name_ja")
+  nameZh      String?  @map("name_zh")
+  monsterType String   @map("monster_type")
+  threatLevel String   @map("threat_level")
+  elements    String   @default("")
+  weaknesses  String   @default("")
+  iconUrl     String?  @map("icon_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-// 物品系统
-model Item {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  // 多语言支持 - 直接嵌入，避免复杂关联
-  names        Json // { "en": "Iron Ore", "ja": "鉄鉱石", "zh_Hans": "铁矿石" }
-  descriptions Json? // 可选的多语言描述
-
-  kind       String
-  rarity     Int
-  max_count  Int
-  sell_price Int
-  buy_price  Int
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 技能系统
-model Skill {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names        Json // 多语言名称
-  descriptions Json? // 多语言描述
-
-  // 技能等级数据 - 直接嵌入，避免复杂关联
-  ranks Json // [{ level: 1, descriptions: {...}, modifiers: {...} }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 怪物系统
-model Monster {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names        Json // 多语言名称
-  descriptions Json? // 多语言描述
-  features     Json? // 多语言特征描述
-  species      String?
-
-  // 怪物部位 - 直接嵌入
-  parts   Json? // [{ names: {...}, extract: {...}, flinch: int, sever: int }]
-  // 奖励物品 - 直接嵌入
-  rewards Json? // [{ item_id: int, stack: int, percentage: int, conditions: [...] }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 防具系统
-model ArmorSet {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names  Json // 多语言名称
-  rarity Int
-
-  // 套装奖励 - 直接嵌入
-  set_bonus   Json? // { names: {...}, ranks: [...] }
-  group_bonus Json? // 组合奖励
-
-  // 防具件 - 直接嵌入
-  pieces Json // [{ kind: "head", names: {...}, descriptions: {...}, ... }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 护石系统 (Amulet/Charm)
-model Amulet {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  // 护石等级数据 - 直接嵌入
-  ranks Json // [{ names: {...}, descriptions: {...}, rarity: int, level: int, ... }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 饰品/配件系统 (Accessory - 装饰品)
-model Accessory {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names        Json // 多语言名称
-  descriptions Json? // 多语言描述
-
-  rarity Int
-  price  Int
-  level  Int // 装饰品等级
-
-  // 技能效果 - 直接嵌入技能ID和等级的映射
-  skills Json // { "skill_game_id": level }
-
-  allowed_on    String // "weapon", "armor", etc.
-  icon_color    String?
-  icon_color_id Int?
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 魅力/饰品系统 (Charm - 穿戴饰品)
-model Charm {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names Json // 多语言名称
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 武器系统
-model WeaponSeries {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names Json // 多语言名称
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  @@index([gameId])
+  @@map("large_monsters")
 }
 
 model Weapon {
+  id            Int      @id @default(autoincrement())
+  gameId        String   @unique @map("game_id")
+  nameEn        String   @map("name_en")
+  nameJa        String   @map("name_ja")
+  nameZh        String?  @map("name_zh")
+  weaponType    String   @map("weapon_type")
+  rarity        Int      @default(1)
+  attack        Int      @default(0)
+  elementType   String?  @map("element_type")
+  elementDamage Int?     @map("element_damage")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([gameId])
+  @@map("weapons")
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  gameId    String   @unique @map("game_id")
+  nameEn    String   @map("name_en")
+  nameJa    String   @map("name_ja")
+  nameZh    String?  @map("name_zh")
+  category  String
+  rarity    Int      @default(1)
+  value     Int      @default(0)
+  iconUrl   String?  @map("icon_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([gameId])
+  @@map("items")
+}
+
+model Monster {
   id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
+  game_id String @unique
+  data    String
 
-  kind         String // "great-sword", "bow", etc.
-  names        Json // 多语言名称
-  descriptions Json? // 多语言描述
-
-  // 基础属性
-  rarity     Int?
-  attack_raw Int?
-  affinity   Int?
-  defense    Int?
-  slots      Json? // 装饰品槽位数组
-
-  // 锋利度相关
-  sharpness  Json? // 锋利度数据 { "red": 60, "orange": 60, ... }
-  handicraft Json? // 匠技能影响 [50]
-
-  // 元素属性
-  element_type   String? // "fire", "water", "thunder", "ice", "dragon", "poison", "sleep", "paralysis", "blast"
-  element_damage Int?
-  element_hidden Boolean? @default(false)
-
-  // 弹药相关 (弓箭/弩)
-  ammo          Json? // 弹药数据
-  coatings      Json? // 涂层数据
-  charge_levels Json? // 蓄力等级
-
-  // 狩猎笛相关
-  melodies Json? // 旋律数据
-  songs    Json? // 音符组合
-
-  // 虫棍相关
-  kinsect_bonus String? // 猎虫奖励类型
-
-  // 制作与强化
-  crafting_cost Int?
-  upgrade_cost  Int?
-  materials     Json? // 制作材料 { "item_game_id": amount }
-
-  // 强化路径 (简化处理)
-  series_id    Int?
-  previous_id  Int?
-  next_weapons Json? // 后续强化武器的 game_id 数组
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 防具升级数据
-model ArmorUpgrade {
-  id     Int @id @default(autoincrement())
-  rarity Int @unique
-
-  // 升级步骤 - 直接嵌入
-  steps Json // [{ level: 2, extra_defense: 2, point_cost: 10, zenny_cost: 40 }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 物种系统
-model Species {
-  id   Int    @id @default(autoincrement())
-  kind String @unique // "flying-wyvern", "fish", "herbivore", etc.
-
-  names Json // 多语言名称
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 舞台/地图系统
-model Stage {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names Json // 多语言名称
-  areas Int // 区域数量
-
-  // 营地数据 - 直接嵌入
-  camps Json? // [{ game_id: int, names: {...}, area: int, floor: int, risk: "safe", position: {...} }]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 狩猎笛专用数据
-model HuntingHornMelody {
-  id      Int @id @default(autoincrement())
-  game_id Int @unique
-
-  notes Json // ["white", "red", "blue"]
-  songs Json // [1, 11, 15, 33, 46, 48]
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-model HuntingHornSong {
-  id        Int @id @default(autoincrement())
-  effect_id Int @unique
-
-  notes Json // ["purple", "purple"]
-  names Json // 多语言名称
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-}
-
-// 部位名称数据
-model PartName {
-  id      Int    @id @default(autoincrement())
-  game_id BigInt @unique
-
-  names Json // 多语言名称
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  @@map("monsters")
 }
