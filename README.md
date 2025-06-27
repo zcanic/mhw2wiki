@@ -54,8 +54,8 @@ mhwildswiki/
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/zcanic/mhwildswiki.git
-cd mhwildswiki
+git clone https://github.com/zcanic/mhw2wiki.git
+cd mhw2wiki
 
 # 2. 安装依赖 (使用pnpm)
 pnpm install
@@ -85,9 +85,15 @@ pnpm dev
 
 **下一阶段**: 搜索筛选功能、性能优化、用户体验增强
 
-## ⚠️ 技术栈澄清 (2025-06-28)
+## ⚠️ 数据真实性声明 (2025-06-28)
 
-本次净化过程中发现并修复的技术栈不一致问题：
+本项目严格遵守数据真实性原则：
+- ✅ **绝不生成虚假数据**: 所有数据必须来源于原始游戏数据库文件
+- ✅ **不进行主观推断**: 移除了所有"智能映射"逻辑，不根据物种等特征推断数据
+- ✅ **保持数据完整性**: 缺失的数据标记为空值或"Unknown"，绝不填充假想内容
+- ✅ **尊重原始数据**: 以 output/merged/ 目录中的JSON文件为唯一数据来源
+
+技术栈澄清:
 - ✅ **删除Docker配置**: 移除 `docker-compose.dev.yml` (与"无Docker"声明冲突)
 - ✅ **统一包管理器**: 删除 `package-lock.json`，使用pnpm
 - ✅ **澄清数据库技术**: SQLite(开发) + PostgreSQL(生产可选)

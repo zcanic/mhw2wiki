@@ -62,7 +62,7 @@ export class ItemsService {
       category: dbItem.kind,
       description: `${names.en || names.ja} - ${dbItem.kind}`,
       rarity: dbItem.rarity,
-      value: dbItem.rarity * 100 // 临时计算value，基于稀有度
+      value: 0 // 使用默认值，不假设任何计算逻辑
     };
   }
 }

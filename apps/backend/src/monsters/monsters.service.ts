@@ -123,38 +123,17 @@ export class MonstersService {
     const name = names.en || names.ja || 'Unknown';
     const species = dbMonster.species || 'Unknown';
     
-    // 根据物种推断威胁等级
-    const threatLevelMap: { [key: string]: number } = {
-      'construct': 8,
-      'flying-wyvern': 6,
-      'brute-wyvern': 5,
-      'fanged-beast': 4,
-      'temnoceran': 5,
-      'demi-elder': 7,
-      'elder-dragon': 9
-    };
-
-    // 根据物种推断栖息地
-    const habitatMap: { [key: string]: string } = {
-      'construct': 'Ruins',
-      'flying-wyvern': 'Sky/Mountains',
-      'brute-wyvern': 'Desert/Wasteland',
-      'fanged-beast': 'Forest',
-      'temnoceran': 'Cave/Underground',
-      'demi-elder': 'Forbidden Lands',
-      'elder-dragon': 'Elder Recess'
-    };
-
     return {
       id: dbMonster.id.toString(),
       name,
       description: `${name} - ${species}`,
       species,
-      elements: species === 'construct' ? ['Non-Elemental'] : ['Unknown'],
-      weaknesses: species === 'construct' ? ['Thunder', 'Dragon'] : ['Fire'],
-      threatLevel: threatLevelMap[species] || 3,
-      habitat: habitatMap[species] || 'Unknown',
-      locations: [habitatMap[species] || 'Unknown'],
+      // 只返回数据库中实际存在的数据，不生成任何假想数据
+      elements: [], // 空数组，不假设任何元素属性
+      weaknesses: [], // 空数组，不假设任何弱点
+      threatLevel: 0, // 默认值，不假设威胁等级
+      habitat: 'Unknown', // 明确标记为未知
+      locations: [], // 空数组，不假设任何位置
       rewards: [],
       imageUrl: '/images/monsters/placeholder.jpg',
       iconUrl: '/images/icons/placeholder.png'

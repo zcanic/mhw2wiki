@@ -25,35 +25,21 @@
 
 #### 4. 物品数据字段缺失
 - **问题**: items service中访问不存在的`sell_price`字段
-- **修复**: 基于稀有度计算value值 (`value = rarity * 100`)
+- **修复**: 移除错误的价值计算逻辑，使用数据库原始数据
 - **状态**: ✅ 已修复
 
 #### 5. 怪物数据硬编码问题
 - **问题**: 所有怪物的habitat、threatLevel、elements、weaknesses都是默认/空值
-- **修复**: 基于species智能推断各字段值
+- **修复**: 移除错误的"智能推断"逻辑，保持数据真实性，不生成虚假数据
 - **状态**: ✅ 已修复
 
-### 智能数据映射系统
+### 数据真实性原则
 
-#### 怪物威胁等级映射
-```
-construct → 8 (高威胁构造体)
-demi-elder → 7 (古龙级)
-flying-wyvern → 6 (飞龙)
-brute-wyvern → 5 (蛮颚龙)
-temnoceran → 5 (鋏角种)
-fanged-beast → 4 (牙兽)
-```
-
-#### 怪物栖息地映射
-```
-construct → Ruins (遗迹)
-flying-wyvern → Sky/Mountains (天空/山地)
-brute-wyvern → Desert/Wasteland (沙漠/荒地)
-fanged-beast → Forest (森林)
-temnoceran → Cave/Underground (洞穴/地下)
-demi-elder → Forbidden Lands (禁域)
-```
+本项目严格遵守数据真实性原则：
+- **绝不生成虚假数据**: 所有数据必须来源于原始游戏数据库
+- **不进行主观推断**: 不根据物种或其他特征推断威胁等级、栖息地等信息
+- **保持数据完整性**: 缺失的数据标记为空值或"Unknown"，不填充假想内容
+- **尊重原始数据**: 以原始JSON数据文件为唯一数据来源
 
 ## 项目进展报告
 *最后更新: 2025年6月28日*
