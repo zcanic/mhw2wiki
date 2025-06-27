@@ -10,6 +10,7 @@
     "db:push": "prisma db push",
     "db:reset": "prisma db push --force-reset",
     "db:seed": "tsx scripts/import.ts",
+    "db:update": "tsx scripts/update-data.ts",
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "type-check": "tsc --noEmit",

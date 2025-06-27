@@ -10,6 +10,7 @@
 | 🏗️ **技术架构** | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 项目架构和技术选型 |
 | 📊 **数据模式** | [docs/DATA_SCHEMA.md](./docs/DATA_SCHEMA.md) | 数据库设计和优化 |
 | 📈 **数据概览** | [docs/DATA_OVERVIEW.md](./docs/DATA_OVERVIEW.md) | 数据分析和业务价值 |
+| 🔄 **数据更新** | [docs/DATA_UPDATE.md](./docs/DATA_UPDATE.md) | 数据更新流程和最佳实践 |
 | 🚀 **部署指南** | [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | 宝塔面板部署流程 |
 | 💻 **开发指南** | [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | 开发环境和最佳实践 |
 | 🧪 **测试策略** | [docs/TESTING.md](./docs/TESTING.md) | 质量保证和测试规范 |
