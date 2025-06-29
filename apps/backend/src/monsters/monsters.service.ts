@@ -14,11 +14,76 @@ export class MonstersService {
       weaknesses: ['Fire', 'Thunder'],
       locations: ['Ancient Forest'],
       habitat: 'Forest',
+      iconUrl: '/monsters/great-jagras-icon.png',
+      imageUrl: '/monsters/great-jagras.png',
       rewards: [
         {
           itemName: 'Great Jagras Hide',
           method: 'Carve',
           dropRate: 50,
+          rank: 'Low'
+        }
+      ]
+    },
+    {
+      id: '2', 
+      name: 'Anjanath',
+      species: 'Brute Wyvern',
+      threatLevel: 3,
+      description: 'A fierce predator with powerful fire attacks.',
+      elements: ['Fire'],
+      weaknesses: ['Water', 'Ice'],
+      locations: ['Ancient Forest', 'Wildspire Waste'],
+      habitat: 'Forest',
+      iconUrl: '/monsters/anjanath-icon.png',
+      imageUrl: '/monsters/anjanath.png',
+      rewards: [
+        {
+          itemName: 'Anjanath Scale',
+          method: 'Carve',
+          dropRate: 40,
+          rank: 'Low'
+        }
+      ]
+    },
+    {
+      id: '3',
+      name: 'Rathalos',
+      species: 'Flying Wyvern',
+      threatLevel: 5,
+      description: 'The king of the skies, master of aerial combat.',
+      elements: ['Fire'],
+      weaknesses: ['Dragon', 'Thunder'],
+      locations: ['Ancient Forest', 'Coral Highlands'],
+      habitat: 'Sky',
+      iconUrl: '/monsters/rathalos-icon.png',
+      imageUrl: '/monsters/rathalos.png',
+      rewards: [
+        {
+          itemName: 'Rathalos Scale',
+          method: 'Carve',
+          dropRate: 35,
+          rank: 'High'
+        }
+      ]
+    },
+    {
+      id: '4',
+      name: 'Kulu-Ya-Ku',
+      species: 'Bird Wyvern',
+      threatLevel: 2,
+      description: 'A curious bird wyvern that collects rocks.',
+      elements: [],
+      weaknesses: ['Water', 'Thunder'],
+      locations: ['Ancient Forest', 'Wildspire Waste'],
+      habitat: 'Desert',
+      iconUrl: '/monsters/kulu-ya-ku-icon.png',
+      imageUrl: '/monsters/kulu-ya-ku.png',
+      rewards: [
+        {
+          itemName: 'Kulu-Ya-Ku Hide',
+          method: 'Carve',
+          dropRate: 45,
           rank: 'Low'
         }
       ]

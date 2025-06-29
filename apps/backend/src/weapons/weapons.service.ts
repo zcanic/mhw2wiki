@@ -11,6 +11,41 @@ export class WeaponsService {
       attack: 100,
       rarity: 1,
       description: 'A basic iron great sword.'
+    },
+    {
+      id: '2',
+      name: 'Flame Blade',
+      type: 'Long Sword',
+      attack: 120,
+      rarity: 2,
+      element: 'Fire',
+      description: 'A long sword imbued with fire.'
+    },
+    {
+      id: '3',
+      name: 'Lightning Hammer',
+      type: 'Hammer',
+      attack: 150,
+      rarity: 3,
+      element: 'Thunder',
+      description: 'A powerful hammer crackling with electricity.'
+    },
+    {
+      id: '4',
+      name: 'Hunter\'s Bow',
+      type: 'Bow',
+      attack: 80,
+      rarity: 1,
+      description: 'A reliable bow for beginners.'
+    },
+    {
+      id: '5',
+      name: 'Rathalos Sword',
+      type: 'Great Sword',
+      attack: 180,
+      rarity: 4,
+      element: 'Fire',
+      description: 'A great sword forged from Rathalos materials.'
     }
   ];
 
