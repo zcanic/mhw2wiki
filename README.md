@@ -1,28 +1,40 @@
 # MHWildsWiki
 
-> 现代化的《怪物猎人：荒野》游戏数据资料库，采用 **Turborepo Monorepo** 架构，**无 Docker**，**宝塔面板友好** 的部署方案。
+> 现代化的《怪物猎人：荒野》游戏数据资料库，采用 **Turborepo Monorepo** 架构，**Next.js 14** + **GraphQL** 技术栈。
+
+## 📊 项目状态
+
+- **开发阶段**: P1阶段75%完成，准备进入P2阶段
+- **功能状态**: 详情页系统完成，全局搜索开发中
+- **数据规模**: 13万+条游戏数据记录
+- **技术架构**: 现代化Web技术栈，生产就绪
 
 ## 📚 文档导航
 
 | 文档类型 | 链接 | 描述 |
 |----------|------|------|
-| 📖 **完整文档中心** | [**docs/README.md**](./docs/README.md) | 完整文档导航中心 |
-| 🏗️ **技术架构** | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 项目架构和技术选型 |
-| 📊 **数据模式** | [docs/DATA_SCHEMA.md](./docs/DATA_SCHEMA.md) | 数据库设计和优化 |
-|  **部署指南** | [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | 宝塔面板部署流程 |
-| 💻 **开发指南** | [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | 开发环境和最佳实践 |
-| 📋 **技术报告** | [docs/TECHNICAL_REPORTS.md](./docs/TECHNICAL_REPORTS.md) | 数据修复和项目进展报告 |
+| 📖 **文档中心** | [**docs/README.md**](./docs/README.md) | 完整文档导航中心 |
+| 🏗️ **系统架构** | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 整体系统架构设计 |
+| � **开发指南** | [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | 开发环境配置指南 |
+| � **部署流程** | [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) | 生产环境部署指南 |
 
 ## 🎯 项目概述
 
-**13万+ 条游戏数据记录** 的《怪物猎人：荒野》资料库，涵盖怪物、武器、防具、技能、物品等全面数据。
+**MHWildsWiki** 是一个现代化的《怪物猎人：荒野》游戏数据资料库，包含 **13万+条游戏数据记录**，涵盖怪物、武器、防具、技能、物品等全面游戏内容。
+
+### ✨ 核心功能
+- **详情页系统**: 怪物、武器、物品的完整详情展示 ✅
+- **数据关联**: 掉落奖励、制作材料、获取方式 🚧 75%完成
+- **全局搜索**: 跨类型统一搜索功能 🔄 P2阶段开发中
+- **高级筛选**: 多条件筛选和排序 ⏳ 计划中
+- **响应式设计**: 完美适配移动端和桌面端 ✅
 
 ### 核心技术栈
 
-- **前端**: Next.js 14 + Tailwind CSS + shadcn/ui
+- **前端**: Next.js 14 + Tailwind CSS + Apollo Client
 - **后端**: NestJS + GraphQL + Prisma
-- **数据库**: SQLite (开发) / PostgreSQL (生产可选)
-- **部署**: 宝塔面板 + PM2 + Nginx (无 Docker)
+- **数据库**: SQLite (开发) / PostgreSQL (生产)
+- **部署**: Turborepo + PM2 + Nginx
 - **包管理**: pnpm (Monorepo优化)
 
 ### 项目结构
@@ -47,58 +59,76 @@ mhwildswiki/
 
 ### 环境要求
 - Node.js >= 18
-- PostgreSQL >= 13
-- Git
+- pnpm >= 8
 
-### 安装和运行
-
+### 开发环境启动
 ```bash
-# 1. 克隆项目
-git clone https://github.com/zcanic/mhw2wiki.git
-cd mhw2wiki
+# 克隆项目
+git clone https://github.com/your-username/mhwildswiki.git
+cd mhwildswiki
 
-# 2. 安装依赖 (使用pnpm)
+# 安装依赖
 pnpm install
 
-# 3. 配置数据库
-cp packages/database/.env.example packages/database/.env
-# 编辑 .env 文件设置数据库连接
-
-# 4. 初始化数据库
-cd packages/database
-pnpm db:generate
-pnpm db:push
-pnpm db:seed
-cd ../..
-
-# 5. 启动开发服务器
+# 启动开发服务器
 pnpm dev
 ```
 
-## 📊 当前状态
+访问 http://localhost:3000 查看前端，http://localhost:4000/graphql 查看GraphQL Playground。
 
-✅ **基础架构完成** - Monorepo + TypeScript + Prisma
-✅ **数据层完成** - 13万+ 数据记录导入验证
-✅ **后端API完成** - NestJS + GraphQL + 四大核心模块
-✅ **前端界面完成** - Next.js + 现代化UI + 数据展示
-✅ **数据一致性修复** - 前后端数据流完全贯通
+### 数据库设置
+```bash
+# 生成Prisma客户端
+cd packages/database
+pnpm generate
 
-**下一阶段**: 搜索筛选功能、性能优化、用户体验增强
+# 运行数据库迁移
+pnpm migrate
 
-## ⚠️ 数据真实性声明 (2025-06-28)
+# 导入游戏数据 (可选)
+pnpm import-data
+```
 
-本项目严格遵守数据真实性原则：
-- ✅ **绝不生成虚假数据**: 所有数据必须来源于原始游戏数据库文件
-- ✅ **不进行主观推断**: 移除了所有"智能映射"逻辑，不根据物种等特征推断数据
-- ✅ **保持数据完整性**: 缺失的数据标记为空值或"Unknown"，绝不填充假想内容
-- ✅ **尊重原始数据**: 以 output/merged/ 目录中的JSON文件为唯一数据来源
+## 🎯 开发路线图
 
-技术栈澄清:
-- ✅ **删除Docker配置**: 移除 `docker-compose.dev.yml` (与"无Docker"声明冲突)
-- ✅ **统一包管理器**: 删除 `package-lock.json`，使用pnpm
-- ✅ **澄清数据库技术**: SQLite(开发) + PostgreSQL(生产可选)
-- ✅ **清理冗余脚本**: 移除Docker相关初始化脚本
+### ✅ P1阶段 (75%完成)
+- [x] 详情页面系统 (怪物、武器、物品)
+- [x] 响应式UI设计和移动端适配
+- [x] GraphQL数据关联架构
+- [ ] Mock数据到Prisma真实查询切换
+
+### 🚀 P2阶段 (准备中)
+- [ ] 全局搜索系统 (实现指南已完成)
+- [ ] 高级筛选功能增强
+- [ ] 性能优化 (图片优化、代码分割)
+- [ ] URL状态同步和分享功能
+
+### 🔮 P3阶段 (未来计划)
+- [ ] 用户账户和个性化功能
+- [ ] 装备对比和搭配推荐
+- [ ] 社区功能和用户贡献
+- [ ] PWA优化和离线支持
+
+## 🤝 贡献指南
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+详细的开发规范请参考 [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)。
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🙏 致谢
+
+- 《怪物猎人：荒野》游戏数据来源
+- 开源社区的技术支持
+- 所有贡献者的努力
 
 ---
 
-**详细信息请查看 [完整文档](./docs/README.md)**
+**MHWildsWiki - 为猎人们提供最佳的游戏资料查询体验！** 🏹✨

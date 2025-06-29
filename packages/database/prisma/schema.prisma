@@ -1,4 +1,6 @@
-// MHWildsWiki - SQLite Compatible Schema v1.0
+// MHW2Wiki - Monster Hunter Wilds Data Schema v4.0
+// SQLite for development, PostgreSQL for production
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/client"
@@ -9,63 +11,1368 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model LargeMonster {
-  id          Int      @id @default(autoincrement())
-  gameId      String   @unique @map("game_id")
-  nameEn      String   @map("name_en")
-  nameJa      String   @map("name_ja")
-  nameZh      String?  @map("name_zh")
-  monsterType String   @map("monster_type")
-  threatLevel String   @map("threat_level")
-  elements    String   @default("")
-  weaknesses  String   @default("")
-  iconUrl     String?  @map("icon_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  
-  @@index([gameId])
-  @@map("large_monsters")
+// === 枚举类型定义 ===
+
+enum MonsterType {
+  FLYING_WYVERN      // 飞龙种
+  BRUTE_WYVERN       // 蛮颚龙种  
+  FANGED_WYVERN      // 牙龙种
+  PISCINE_WYVERN     // 鱼龙种
+  BIRD_WYVERN        // 鸟龙种
+  FANGED_BEAST       // 牙兽种
+  HERBIVORE          // 草食种
+  NEOPTERON          // 甲虫种
+  TEMNOCERAN         // 鋏角种
+  AMPHIBIAN          // 两生种
+  ELDER_DRAGON       // 古龙种
+  DEMI_ELDER         // 准古龙
+  CONSTRUCT          // 构造体
+  UNKNOWN            // 未知种
 }
 
-model Weapon {
-  id           Int      @id @default(autoincrement())
-  gameId       String   @unique @map("game_id")
-  nameEn       String   @map("name_en")
-  nameJa       String   @map("name_ja")
-  nameZh       String?  @map("name_zh")
-  weaponType   String   @map("weapon_type")
-  rarity       Int      @default(1)
-  attack       Int      @default(0)
-  elementType  String?  @map("element_type")
-  elementDamage Int?    @map("element_damage")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  
-  @@index([gameId])
-  @@map("weapons")
+enum WeaponType {
+  GREAT_SWORD        // 大剑
+  LONG_SWORD         // 太刀
+  SWORD_AND_SHIELD   // 片手剑
+  DUAL_BLADES        // 双剑
+  HAMMER             // 大锤
+  HUNTING_HORN       // 狩猎笛
+  LANCE              // 长枪
+  GUNLANCE           // 铳枪
+  SWITCH_AXE         // 斩击斧
+  CHARGE_BLADE       // 充能斧
+  INSECT_GLAIVE      // 操虫棍
+  LIGHT_BOWGUN       // 轻弩
+  HEAVY_BOWGUN       // 重弩
+  BOW                // 弓
 }
 
+enum ElementType {
+  FIRE               // 火
+  WATER              // 水
+  THUNDER            // 雷
+  ICE                // 冰
+  DRAGON             // 龙
+  POISON             // 毒
+  SLEEP              // 睡眠
+  PARALYSIS          // 麻痹
+  BLAST              // 爆破
+  NON_ELEMENTAL      // 无属性
+}
+
+enum ArmorType {
+  HEAD               // 头部
+  CHEST              // 胸部
+  ARMS               // 手部
+  WAIST              // 腰部
+  LEGS               // 脚部
+}
+
+enum ItemCategory {
+  CONSUMABLE         // 消耗品
+  MATERIAL           // 素材
+  AMMO               // 弹药
+  TOOL               // 工具
+  KEY_ITEM           // 关键道具
+  DECORATION         // 装饰品
+}
+
+enum ThreatLevel {
+  ONE = 1
+  TWO = 2  
+  THREE = 3
+  FOUR = 4
+  FIVE = 5
+  SIX = 6
+  SEVEN = 7
+  EIGHT = 8
+  NINE = 9
+  TEN = 10
+}
+
+// === 核心领域模型 ===
+
+// 地图/舞台系统
+model Stage {
+  id        Int    @id @default(autoincrement())
+  gameId    BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  // 基础属性
+  areas     Int     @default(0) // 区域数量
+  basecamp  String? // 基地营地信息 JSON
+  
+  // 环境信息
+  climate   String? // 气候类型
+  ecosystem String? // 生态系统 JSON
+  
+  // 图像资源
+  mapUrl    String? @map("map_url")
+  imageUrl  String? @map("image_url")
+  
+  // 时间戳
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  habitats  MonsterHabitat[]
+  
+  @@index([gameId])
+  @@index([areas])
+  @@index([nameEn])
+  @@map("stages")
+}
+
+// 物品系统
 model Item {
-  id          Int      @id @default(autoincrement())
-  gameId      String   @unique @map("game_id")
-  nameEn      String   @map("name_en")
-  nameJa      String   @map("name_ja")
-  nameZh      String?  @map("name_zh")
-  category    String
-  rarity      Int      @default(1)
-  value       Int      @default(0)
-  iconUrl     String?  @map("icon_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          Int          @id @default(autoincrement())
+  gameId      BigInt       @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String       @map("name_en")
+  nameJa      String       @map("name_ja")
+  nameZh      String?      @map("name_zh")
+  
+  // 描述
+  descriptionEn String?    @map("description_en")
+  descriptionJa String?    @map("description_ja")
+  descriptionZh String?    @map("description_zh")
+  
+  // 基础属性
+  category    ItemCategory
+  rarity      Int          @default(1)
+  value       Int          @default(0) // 售价
+  carryLimit  Int?         @map("carry_limit") // 携带上限
+  
+  // 图像资源
+  iconUrl     String?      @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  // 关系
+  monsterRewards    MonsterReward[]
+  weaponMaterials   WeaponMaterial[]
+  armorMaterials    ArmorMaterial[]
+  combinationInputs ItemCombination[] @relation("InputItem")
+  combinationOutput ItemCombination[] @relation("OutputItem")
   
   @@index([gameId])
+  @@index([category])
+  @@index([rarity])
+  @@index([nameEn])
   @@map("items")
 }
 
-model Monster {
-  id      Int     @id @default(autoincrement())
-  game_id String  @unique
-  data    String
+// 物品合成配方
+model ItemCombination {
+  id          Int @id @default(autoincrement())
   
-  @@map("monsters")
+  inputItemId Int @map("input_item_id")
+  inputItem2Id Int? @map("input_item2_id") // 第二个输入物品（可选）
+  outputItemId Int @map("output_item_id")
+  
+  inputQuantity  Int @default(1) @map("input_quantity")
+  input2Quantity Int @default(1) @map("input2_quantity")
+  outputQuantity Int @default(1) @map("output_quantity")
+  
+  successRate   Int @default(100) @map("success_rate") // 成功率百分比
+  
+  inputItem  Item @relation("InputItem", fields: [inputItemId], references: [id], onDelete: Cascade)
+  inputItem2 Item? @relation("InputItem", fields: [inputItem2Id], references: [id], onDelete: Cascade)
+  outputItem Item @relation("OutputItem", fields: [outputItemId], references: [id], onDelete: Cascade)
+  
+  @@unique([inputItemId, inputItem2Id, outputItemId])
+  @@map("item_combinations")
+}
+
+// 技能系统
+model Skill {
+  id          Int    @id @default(autoincrement())
+  gameId      BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String @map("name_en")
+  nameJa      String @map("name_ja")
+  nameZh      String? @map("name_zh")
+  
+  // 描述
+  descriptionEn String? @map("description_en")
+  descriptionJa String? @map("description_ja")
+  descriptionZh String? @map("description_zh")
+  
+  // 技能属性
+  maxLevel    Int     @default(1) @map("max_level")
+  category    String? // "attack", "defense", "utility", etc.
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  weaponSkills  WeaponSkill[]
+  armorSkills   ArmorSkill[]
+  charmSkills   CharmSkill[]
+  armorSetBonuses ArmorSet[] @relation("ArmorSetBonus")
+  
+  @@index([gameId])
+  @@index([category])
+  @@index([nameEn])
+  @@map("skills")
+}
+
+// 大型怪物 - Monster Hunter的核心实体
+model LargeMonster {
+  id            Int         @id @default(autoincrement())
+  gameId        BigInt      @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn        String      @map("name_en")
+  nameJa        String      @map("name_ja") 
+  nameZh        String?     @map("name_zh")
+  
+  // 描述信息
+  descriptionEn String?     @map("description_en")
+  descriptionJa String?     @map("description_ja")
+  descriptionZh String?     @map("description_zh")
+  
+  // 核心属性
+  monsterType   MonsterType @map("monster_type")
+  threatLevel   ThreatLevel @map("threat_level")
+  size          String?     // "small", "large", "giant"
+  
+  // 元素属性
+  elements      ElementType[]
+  weaknesses    ElementType[]
+  resistances   ElementType[]
+  
+  // 图像资源
+  iconUrl       String?     @map("icon_url")
+  imageUrl      String?     @map("image_url")
+  
+  // 时间戳
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  
+  // 关系
+  habitats      MonsterHabitat[]
+  bodyParts     MonsterBodyPart[]
+  rewards       MonsterReward[]
+  
+  @@index([gameId])
+  @@index([monsterType])
+  @@index([threatLevel])
+  @@index([nameEn])
+  @@map("large_monsters")
+}
+
+// 怪物栖息地
+model MonsterHabitat {
+  id        Int @id @default(autoincrement())
+  monsterId Int @map("monster_id")
+  stageId   Int @map("stage_id")
+  
+  // 出现条件
+  isMainHabitat Boolean @default(false) @map("is_main_habitat")
+  conditions    String? // JSON: 出现条件
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  stage   Stage        @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  
+  @@unique([monsterId, stageId])
+  @@map("monster_habitats")
+}
+
+// 怪物身体部位
+model MonsterBodyPart {
+  id        Int    @id @default(autoincrement())
+  monsterId Int    @map("monster_id")
+  
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  // 部位属性
+  breakable Boolean @default(false)
+  severable Boolean @default(false)
+  
+  // 肉质数据
+  cutDamage    Int @default(0) @map("cut_damage")
+  bluntDamage  Int @default(0) @map("blunt_damage")
+  shotDamage   Int @default(0) @map("shot_damage")
+  
+  // 元素耐性
+  fireResistance      Int @default(0) @map("fire_resistance")
+  waterResistance     Int @default(0) @map("water_resistance")
+  thunderResistance   Int @default(0) @map("thunder_resistance")
+  iceResistance       Int @default(0) @map("ice_resistance")
+  dragonResistance    Int @default(0) @map("dragon_resistance")
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  
+  @@map("monster_body_parts")
+}
+
+// 怪物奖励材料
+model MonsterReward {
+  id        Int @id @default(autoincrement())
+  monsterId Int @map("monster_id")
+  itemId    Int @map("item_id")
+  
+  // 获取方式
+  method    String // "carve", "break", "capture", "shiny", "quest_reward"
+  rank      String // "Low", "High", "Master"
+  
+  // 获取率
+  dropRate  Int    // 百分比
+  quantity  Int    @default(1)
+  
+  // 条件
+  condition String? // 特殊条件描述
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  item    Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@map("monster_rewards")
+}
+
+// 武器系列
+model WeaponSeries {
+  id        Int    @id @default(autoincrement())
+  gameId    BigInt @unique @map("game_id")
+  
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  weapons   Weapon[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([gameId])
+  @@map("weapon_series")
+}
+
+// 武器系统 - 统一所有武器类型 
+model Weapon {
+  id          Int        @id @default(autoincrement())
+  gameId      BigInt     @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String     @map("name_en")
+  nameJa      String     @map("name_ja")
+  nameZh      String?    @map("name_zh")
+  
+  // 描述
+  descriptionEn String?  @map("description_en")
+  descriptionJa String?  @map("description_ja")
+  descriptionZh String?  @map("description_zh")
+  
+  // 基础属性
+  weaponType  WeaponType @map("weapon_type")
+  rarity      Int        @default(1)
+  rawAttack   Int        @map("raw_attack")
+  affinity    Int        @default(0) // 会心率，-100到100
+  defense     Int        @default(0)
+  
+  // 锋利度 (近战武器)
+  sharpnessData String? @map("sharpness_data") // JSON: 锋利度数据
+  handicraft    String? @map("handicraft_data") // JSON: 匠技能影响
+  
+  // 元素伤害
+  elementType   ElementType? @map("element_type")
+  elementDamage Int?         @map("element_damage")
+  elementHidden Boolean      @default(false) @map("element_hidden")
+  
+  // 槽位
+  level1Slots Int @default(0) @map("level1_slots")
+  level2Slots Int @default(0) @map("level2_slots") 
+  level3Slots Int @default(0) @map("level3_slots")
+  level4Slots Int @default(0) @map("level4_slots")
+  
+  // 远程武器专用
+  ammoData     String? @map("ammo_data")     // JSON: 弹药数据
+  coatings     String? @map("coatings_data") // JSON: 涂层数据
+  chargeLevels String? @map("charge_levels") // JSON: 蓄力等级
+  
+  // 狩猎笛专用
+  melodies      String? @map("melodies_data") // JSON: 旋律数据
+  songs         String? @map("songs_data")    // JSON: 音符组合
+  
+  // 虫棍专用
+  kinsectBonus String? @map("kinsect_bonus") // 猎虫奖励类型
+  
+  // 制作相关
+  craftingCost Int @default(0) @map("crafting_cost")
+  upgradeCost  Int @default(0) @map("upgrade_cost")
+  
+  // 图像资源
+  iconUrl   String? @map("icon_url")
+  imageUrl  String? @map("image_url")
+  
+  // 时间戳
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  materials      WeaponMaterial[]
+  skills         WeaponSkill[]
+  upgradeFrom    Weapon?          @relation("WeaponUpgrade", fields: [upgradeFromId], references: [id])
+  upgradeFromId  Int?             @map("upgrade_from_id")
+  upgradeTo      Weapon[]         @relation("WeaponUpgrade")
+  series         WeaponSeries?    @relation(fields: [seriesId], references: [id])
+  seriesId       Int?             @map("series_id")
+  
+  @@index([gameId])
+  @@index([weaponType])
+  @@index([rarity])
+  @@index([rawAttack])
+  @@index([nameEn])
+  @@map("weapons")
+}
+
+// 武器制作材料
+model WeaponMaterial {
+  id       Int @id @default(autoincrement())
+  weaponId Int @map("weapon_id")
+  itemId   Int @map("item_id")
+  quantity Int @default(1)
+  
+  weapon Weapon @relation(fields: [weaponId], references: [id], onDelete: Cascade)
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@unique([weaponId, itemId])
+  @@map("weapon_materials")
+}
+
+// 武器技能
+model WeaponSkill {
+  id       Int @id @default(autoincrement())
+  weaponId Int @map("weapon_id")
+  skillId  Int @map("skill_id")
+  level    Int @default(1)
+  
+  weapon Weapon @relation(fields: [weaponId], references: [id], onDelete: Cascade)
+  skill  Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([weaponId, skillId])
+  @@map("weapon_skills")
+}
+
+// 防具系统
+model ArmorSet {
+  id          Int       @id @default(autoincrement())
+  gameId      BigInt    @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String    @map("name_en")
+  nameJa      String    @map("name_ja")
+  nameZh      String?   @map("name_zh")
+  
+  // 基础属性
+  rarity      Int       @default(1)
+  gender      String?   // "male", "female", "both"
+  
+  // 套装奖励
+  setBonusId  Int?      @map("set_bonus_id")
+  setBonusRequiredPieces Int? @default(2) @map("set_bonus_required_pieces")
+  
+  // 时间戳
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // 关系
+  pieces      ArmorPiece[]
+  setBonus    Skill?    @relation("ArmorSetBonus", fields: [setBonusId], references: [id])
+  
+  @@index([gameId])
+  @@index([rarity])
+  @@index([nameEn])
+  @@map("armor_sets")
+}
+
+// 防具部件
+model ArmorPiece {
+  id          Int       @id @default(autoincrement())
+  gameId      BigInt    @unique @map("game_id")
+  
+  armorSetId  Int       @map("armor_set_id")
+  
+  // 多语言名称
+  nameEn      String    @map("name_en")
+  nameJa      String    @map("name_ja")
+  nameZh      String?   @map("name_zh")
+  
+  // 防具类型
+  armorType   ArmorType @map("armor_type")
+  
+  // 防御属性
+  baseDefense Int       @default(0) @map("base_defense")
+  maxDefense  Int       @default(0) @map("max_defense")
+  
+  // 元素耐性
+  fireResistance    Int @default(0) @map("fire_resistance")
+  waterResistance   Int @default(0) @map("water_resistance")
+  thunderResistance Int @default(0) @map("thunder_resistance")
+  iceResistance     Int @default(0) @map("ice_resistance")
+  dragonResistance  Int @default(0) @map("dragon_resistance")
+  
+  // 槽位
+  level1Slots Int @default(0) @map("level1_slots")
+  level2Slots Int @default(0) @map("level2_slots")
+  level3Slots Int @default(0) @map("level3_slots")
+  level4Slots Int @default(0) @map("level4_slots")
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  imageUrl    String? @map("image_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  armorSet    ArmorSet      @relation(fields: [armorSetId], references: [id], onDelete: Cascade)
+  materials   ArmorMaterial[]
+  skills      ArmorSkill[]
+  
+  @@index([gameId])
+  @@index([armorType])
+  @@index([armorSetId])
+  @@index([nameEn])
+  @@map("armor_pieces")
+}
+
+// 防具制作材料
+model ArmorMaterial {
+  id           Int @id @default(autoincrement())
+  armorPieceId Int @map("armor_piece_id")
+  itemId       Int @map("item_id")
+  quantity     Int @default(1)
+  
+  armorPiece ArmorPiece @relation(fields: [armorPieceId], references: [id], onDelete: Cascade)
+  item       Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@unique([armorPieceId, itemId])
+  @@map("armor_materials")
+}
+
+// 防具技能
+model ArmorSkill {
+  id           Int @id @default(autoincrement())
+  armorPieceId Int @map("armor_piece_id")
+  skillId      Int @map("skill_id")
+  level        Int @default(1)
+  
+  armorPiece ArmorPiece @relation(fields: [armorPieceId], references: [id], onDelete: Cascade)
+  skill      Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([armorPieceId, skillId])
+  @@map("armor_skills")
+}
+
+// 护石系统
+model Charm {
+  id          Int    @id @default(autoincrement())
+  gameId      BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String @map("name_en")
+  nameJa      String @map("name_ja")
+  nameZh      String? @map("name_zh")
+  
+  // 基础属性
+  rarity      Int     @default(1)
+  maxLevel    Int     @default(1) @map("max_level")
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  skills      CharmSkill[]
+  levels      CharmLevel[]
+  
+  @@index([gameId])
+  @@index([rarity])
+  @@index([nameEn])
+  @@map("charms")
+}
+
+// 护石等级
+model CharmLevel {
+  id       Int @id @default(autoincrement())
+  charmId  Int @map("charm_id")
+  level    Int
+  
+  // 制作材料和成本
+  materials String? // JSON: 制作材料
+  cost      Int @default(0)
+  
+  charm Charm @relation(fields: [charmId], references: [id], onDelete: Cascade)
+  
+  @@unique([charmId, level])
+  @@map("charm_levels")
+}
+
+// 护石技能
+model CharmSkill {
+  id      Int @id @default(autoincrement())
+  charmId Int @map("charm_id")
+  skillId Int @map("skill_id")
+  level   Int @default(1)
+  
+  charm Charm @relation(fields: [charmId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([charmId, skillId])
+  @@map("charm_skills")
+}r Hunter Wilds Data Schema v4.0
+// PostgreSQL优化，领域驱动设计，关系结构清晰
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// === 枚举类型定义 ===
+
+enum MonsterType {
+  FLYING_WYVERN      // 飞龙种
+  BRUTE_WYVERN       // 蛮颚龙种  
+  FANGED_WYVERN      // 牙龙种
+  PISCINE_WYVERN     // 鱼龙种
+  BIRD_WYVERN        // 鸟龙种
+  FANGED_BEAST       // 牙兽种
+  HERBIVORE          // 草食种
+  NEOPTERON          // 甲虫种
+  TEMNOCERAN         // 鋏角种
+  AMPHIBIAN          // 两生种
+  ELDER_DRAGON       // 古龙种
+  DEMI_ELDER         // 准古龙
+  CONSTRUCT          // 构造体
+  UNKNOWN            // 未知种
+}
+
+enum WeaponType {
+  GREAT_SWORD        // 大剑
+  LONG_SWORD         // 太刀
+  SWORD_AND_SHIELD   // 片手剑
+  DUAL_BLADES        // 双剑
+  HAMMER             // 大锤
+  HUNTING_HORN       // 狩猎笛
+  LANCE              // 长枪
+  GUNLANCE           // 铳枪
+  SWITCH_AXE         // 斩击斧
+  CHARGE_BLADE       // 充能斧
+  INSECT_GLAIVE      // 操虫棍
+  LIGHT_BOWGUN       // 轻弩
+  HEAVY_BOWGUN       // 重弩
+  BOW                // 弓
+}
+
+enum ElementType {
+  FIRE               // 火
+  WATER              // 水
+  THUNDER            // 雷
+  ICE                // 冰
+  DRAGON             // 龙
+  POISON             // 毒
+  SLEEP              // 睡眠
+  PARALYSIS          // 麻痹
+  BLAST              // 爆破
+  NON_ELEMENTAL      // 无属性
+}
+
+enum ArmorType {
+  HEAD               // 头部
+  CHEST              // 胸部
+  ARMS               // 手部
+  WAIST              // 腰部
+  LEGS               // 脚部
+}
+
+enum ItemCategory {
+  CONSUMABLE         // 消耗品
+  MATERIAL           // 素材
+  AMMO               // 弹药
+  TOOL               // 工具
+  KEY_ITEM           // 关键道具
+  DECORATION         // 装饰品
+}
+
+enum ThreatLevel {
+  ONE = 1
+  TWO = 2  
+  THREE = 3
+  FOUR = 4
+  FIVE = 5
+  SIX = 6
+  SEVEN = 7
+  EIGHT = 8
+  NINE = 9
+  TEN = 10
+}
+
+// === 核心领域模型 ===
+
+// 大型怪物 - Monster Hunter的核心实体
+model LargeMonster {
+  id            Int         @id @default(autoincrement())
+  gameId        BigInt      @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn        String      @map("name_en")
+  nameJa        String      @map("name_ja") 
+  nameZh        String?     @map("name_zh")
+  
+  // 描述信息
+  descriptionEn String?     @map("description_en")
+  descriptionJa String?     @map("description_ja")
+  descriptionZh String?     @map("description_zh")
+  
+  // 核心属性
+  monsterType   MonsterType @map("monster_type")
+  threatLevel   ThreatLevel @map("threat_level")
+  size          String?     // "small", "large", "giant"
+  
+  // 元素属性
+  elements      ElementType[]
+  weaknesses    ElementType[]
+  resistances   ElementType[]
+  
+  // 图像资源
+  iconUrl       String?     @map("icon_url")
+  imageUrl      String?     @map("image_url")
+  
+  // 时间戳
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  
+  // 关系
+  habitats      MonsterHabitat[]
+  bodyParts     MonsterBodyPart[]
+  rewards       MonsterReward[]
+  
+  @@index([gameId])
+  @@index([monsterType])
+  @@index([threatLevel])
+  @@index([nameEn])
+  @@map("large_monsters")
+}
+
+// 怪物栖息地
+model MonsterHabitat {
+  id        Int @id @default(autoincrement())
+  monsterId Int @map("monster_id")
+  stageId   Int @map("stage_id")
+  
+  // 出现条件
+  isMainHabitat Boolean @default(false) @map("is_main_habitat")
+  conditions    String? // JSON: 出现条件
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  stage   Stage        @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  
+  @@unique([monsterId, stageId])
+  @@map("monster_habitats")
+}
+
+// 怪物身体部位
+model MonsterBodyPart {
+  id        Int    @id @default(autoincrement())
+  monsterId Int    @map("monster_id")
+  
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  // 部位属性
+  breakable Boolean @default(false)
+  severable Boolean @default(false)
+  
+  // 肉质数据
+  cutDamage    Int @default(0) @map("cut_damage")
+  bluntDamage  Int @default(0) @map("blunt_damage")
+  shotDamage   Int @default(0) @map("shot_damage")
+  
+  // 元素耐性
+  fireResistance      Int @default(0) @map("fire_resistance")
+  waterResistance     Int @default(0) @map("water_resistance")
+  thunderResistance   Int @default(0) @map("thunder_resistance")
+  iceResistance       Int @default(0) @map("ice_resistance")
+  dragonResistance    Int @default(0) @map("dragon_resistance")
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  
+  @@map("monster_body_parts")
+}
+
+// 怪物奖励材料
+model MonsterReward {
+  id        Int @id @default(autoincrement())
+  monsterId Int @map("monster_id")
+  itemId    Int @map("item_id")
+  
+  // 获取方式
+  method    String // "carve", "break", "capture", "shiny", "quest_reward"
+  rank      String // "Low", "High", "Master"
+  
+  // 获取率
+  dropRate  Int    // 百分比
+  quantity  Int    @default(1)
+  
+  // 条件
+  condition String? // 特殊条件描述
+  
+  monster LargeMonster @relation(fields: [monsterId], references: [id], onDelete: Cascade)
+  item    Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@map("monster_rewards")
+}
+
+// 武器制作材料
+model WeaponMaterial {
+  id       Int @id @default(autoincrement())
+  weaponId Int @map("weapon_id")
+  itemId   Int @map("item_id")
+  quantity Int @default(1)
+  
+  weapon Weapon @relation(fields: [weaponId], references: [id], onDelete: Cascade)
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@unique([weaponId, itemId])
+  @@map("weapon_materials")
+}
+
+// 武器技能
+model WeaponSkill {
+  id       Int @id @default(autoincrement())
+  weaponId Int @map("weapon_id")
+  skillId  Int @map("skill_id")
+  level    Int @default(1)
+  
+  weapon Weapon @relation(fields: [weaponId], references: [id], onDelete: Cascade)
+  skill  Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([weaponId, skillId])
+  @@map("weapon_skills")
+}
+
+// 武器系列
+model WeaponSeries {
+  id        Int    @id @default(autoincrement())
+  gameId    BigInt @unique @map("game_id")
+  
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  weapons   Weapon[]
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([gameId])
+  @@map("weapon_series")
+}
+
+// 物品系统
+model Item {
+  id          Int          @id @default(autoincrement())
+  gameId      BigInt       @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String       @map("name_en")
+  nameJa      String       @map("name_ja")
+  nameZh      String?      @map("name_zh")
+  
+  // 描述
+  descriptionEn String?    @map("description_en")
+  descriptionJa String?    @map("description_ja")
+  descriptionZh String?    @map("description_zh")
+  
+  // 基础属性
+  category    ItemCategory
+  rarity      Int          @default(1)
+  value       Int          @default(0) // 售价
+  carryLimit  Int?         @map("carry_limit") // 携带上限
+  
+  // 图像资源
+  iconUrl     String?      @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  // 关系
+  monsterRewards    MonsterReward[]
+  weaponMaterials   WeaponMaterial[]
+  armorMaterials    ArmorMaterial[]
+  combinationInputs ItemCombination[] @relation("InputItem")
+  combinationOutput ItemCombination[] @relation("OutputItem")
+  
+  @@index([gameId])
+  @@index([category])
+  @@index([rarity])
+  @@index([nameEn])
+  @@map("items")
+}
+
+// 物品合成配方
+model ItemCombination {
+  id          Int @id @default(autoincrement())
+  
+  inputItemId Int @map("input_item_id")
+  inputItem2Id Int? @map("input_item2_id") // 第二个输入物品（可选）
+  outputItemId Int @map("output_item_id")
+  
+  inputQuantity  Int @default(1) @map("input_quantity")
+  input2Quantity Int @default(1) @map("input2_quantity")
+  outputQuantity Int @default(1) @map("output_quantity")
+  
+  successRate   Int @default(100) @map("success_rate") // 成功率百分比
+  
+  inputItem  Item @relation("InputItem", fields: [inputItemId], references: [id], onDelete: Cascade)
+  inputItem2 Item? @relation("InputItem", fields: [inputItem2Id], references: [id], onDelete: Cascade)
+  outputItem Item @relation("OutputItem", fields: [outputItemId], references: [id], onDelete: Cascade)
+  
+  @@unique([inputItemId, inputItem2Id, outputItemId])
+  @@map("item_combinations")
+}
+
+// 技能系统
+model Skill {
+  id          Int    @id @default(autoincrement())
+  gameId      BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String @map("name_en")
+  nameJa      String @map("name_ja")
+  nameZh      String? @map("name_zh")
+  
+  // 描述
+  descriptionEn String? @map("description_en")
+  descriptionJa String? @map("description_ja")
+  descriptionZh String? @map("description_zh")
+  
+  // 技能属性
+  maxLevel    Int     @default(1) @map("max_level")
+  category    String? // "attack", "defense", "utility", etc.
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  weaponSkills  WeaponSkill[]
+  armorSkills   ArmorSkill[]
+  charmSkills   CharmSkill[]
+  armorSetBonuses ArmorSet[] @relation("ArmorSetBonus")
+  
+  @@index([gameId])
+  @@index([category])
+  @@index([nameEn])
+  @@map("skills")
+}
+
+// 防具系统
+model ArmorSet {
+  id          Int       @id @default(autoincrement())
+  gameId      BigInt    @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String    @map("name_en")
+  nameJa      String    @map("name_ja")
+  nameZh      String?   @map("name_zh")
+  
+  // 基础属性
+  rarity      Int       @default(1)
+  gender      String?   // "male", "female", "both"
+  
+  // 套装奖励
+  setBonusId  Int?      @map("set_bonus_id")
+  setBonusRequiredPieces Int? @default(2) @map("set_bonus_required_pieces")
+  
+  // 时间戳
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // 关系
+  pieces      ArmorPiece[]
+  setBonus    Skill?    @relation("ArmorSetBonus", fields: [setBonusId], references: [id])
+  
+  @@index([gameId])
+  @@index([rarity])
+  @@index([nameEn])
+  @@map("armor_sets")
+}
+
+// 防具部件
+model ArmorPiece {
+  id          Int       @id @default(autoincrement())
+  gameId      BigInt    @unique @map("game_id")
+  
+  armorSetId  Int       @map("armor_set_id")
+  
+  // 多语言名称
+  nameEn      String    @map("name_en")
+  nameJa      String    @map("name_ja")
+  nameZh      String?   @map("name_zh")
+  
+  // 防具类型
+  armorType   ArmorType @map("armor_type")
+  
+  // 防御属性
+  baseDefense Int       @default(0) @map("base_defense")
+  maxDefense  Int       @default(0) @map("max_defense")
+  
+  // 元素耐性
+  fireResistance    Int @default(0) @map("fire_resistance")
+  waterResistance   Int @default(0) @map("water_resistance")
+  thunderResistance Int @default(0) @map("thunder_resistance")
+  iceResistance     Int @default(0) @map("ice_resistance")
+  dragonResistance  Int @default(0) @map("dragon_resistance")
+  
+  // 槽位
+  level1Slots Int @default(0) @map("level1_slots")
+  level2Slots Int @default(0) @map("level2_slots")
+  level3Slots Int @default(0) @map("level3_slots")
+  level4Slots Int @default(0) @map("level4_slots")
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  imageUrl    String? @map("image_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  armorSet    ArmorSet      @relation(fields: [armorSetId], references: [id], onDelete: Cascade)
+  materials   ArmorMaterial[]
+  skills      ArmorSkill[]
+  
+  @@index([gameId])
+  @@index([armorType])
+  @@index([armorSetId])
+  @@index([nameEn])
+  @@map("armor_pieces")
+}
+
+// 防具制作材料
+model ArmorMaterial {
+  id           Int @id @default(autoincrement())
+  armorPieceId Int @map("armor_piece_id")
+  itemId       Int @map("item_id")
+  quantity     Int @default(1)
+  
+  armorPiece ArmorPiece @relation(fields: [armorPieceId], references: [id], onDelete: Cascade)
+  item       Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  
+  @@unique([armorPieceId, itemId])
+  @@map("armor_materials")
+}
+
+// 防具技能
+model ArmorSkill {
+  id           Int @id @default(autoincrement())
+  armorPieceId Int @map("armor_piece_id")
+  skillId      Int @map("skill_id")
+  level        Int @default(1)
+  
+  armorPiece ArmorPiece @relation(fields: [armorPieceId], references: [id], onDelete: Cascade)
+  skill      Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([armorPieceId, skillId])
+  @@map("armor_skills")
+}
+
+// 护石系统
+model Charm {
+  id          Int    @id @default(autoincrement())
+  gameId      BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String @map("name_en")
+  nameJa      String @map("name_ja")
+  nameZh      String? @map("name_zh")
+  
+  // 基础属性
+  rarity      Int     @default(1)
+  maxLevel    Int     @default(1) @map("max_level")
+  
+  // 图像资源
+  iconUrl     String? @map("icon_url")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  skills      CharmSkill[]
+  levels      CharmLevel[]
+  
+  @@index([gameId])
+  @@index([rarity])
+  @@index([nameEn])
+  @@map("charms")
+}
+
+// 护石等级
+model CharmLevel {
+  id       Int @id @default(autoincrement())
+  charmId  Int @map("charm_id")
+  level    Int
+  
+  // 制作材料和成本
+  materials String? // JSON: 制作材料
+  cost      Int @default(0)
+  
+  charm Charm @relation(fields: [charmId], references: [id], onDelete: Cascade)
+  
+  @@unique([charmId, level])
+  @@map("charm_levels")
+}
+
+// 护石技能
+model CharmSkill {
+  id      Int @id @default(autoincrement())
+  charmId Int @map("charm_id")
+  skillId Int @map("skill_id")
+  level   Int @default(1)
+  
+  charm Charm @relation(fields: [charmId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([charmId, skillId])
+  @@map("charm_skills")
+}
+
+// 地图/舞台系统
+model Stage {
+  id        Int    @id @default(autoincrement())
+  gameId    BigInt @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn    String @map("name_en")
+  nameJa    String @map("name_ja")
+  nameZh    String? @map("name_zh")
+  
+  // 基础属性
+  areas     Int     @default(0) // 区域数量
+  basecamp  String? // 基地营地信息 JSON
+  
+  // 环境信息
+  climate   String? // 气候类型
+  ecosystem String? // 生态系统 JSON
+  
+  // 图像资源
+  mapUrl    String? @map("map_url")
+  imageUrl  String? @map("image_url")
+  
+  // 时间戳
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  habitats  MonsterHabitat[]
+  
+  @@index([gameId])
+  @@index([areas])
+  @@index([nameEn])
+  @@map("stages")
+}
+
+// 武器系统 - 统一所有武器类型 
+model Weapon {
+  id          Int        @id @default(autoincrement())
+  gameId      BigInt     @unique @map("game_id")
+  
+  // 多语言名称
+  nameEn      String     @map("name_en")
+  nameJa      String     @map("name_ja")
+  nameZh      String?    @map("name_zh")
+  
+  // 描述
+  descriptionEn String?  @map("description_en")
+  descriptionJa String?  @map("description_ja")
+  descriptionZh String?  @map("description_zh")
+  
+  // 基础属性
+  weaponType  WeaponType @map("weapon_type")
+  rarity      Int        @default(1)
+  rawAttack   Int        @map("raw_attack")
+  affinity    Int        @default(0) // 会心率，-100到100
+  defense     Int        @default(0)
+  
+  // 锋利度 (近战武器)
+  sharpnessData String? @map("sharpness_data") // JSON: 锋利度数据
+  handicraft    String? @map("handicraft_data") // JSON: 匠技能影响
+  
+  // 元素伤害
+  elementType   ElementType? @map("element_type")
+  elementDamage Int?         @map("element_damage")
+  elementHidden Boolean      @default(false) @map("element_hidden")
+  
+  // 槽位
+  level1Slots Int @default(0) @map("level1_slots")
+  level2Slots Int @default(0) @map("level2_slots") 
+  level3Slots Int @default(0) @map("level3_slots")
+  level4Slots Int @default(0) @map("level4_slots")
+  
+  // 远程武器专用
+  ammoData     String? @map("ammo_data")     // JSON: 弹药数据
+  coatings     String? @map("coatings_data") // JSON: 涂层数据
+  chargeLevels String? @map("charge_levels") // JSON: 蓄力等级
+  
+  // 狩猎笛专用
+  melodies      String? @map("melodies_data") // JSON: 旋律数据
+  songs         String? @map("songs_data")    // JSON: 音符组合
+  
+  // 虫棍专用
+  kinsectBonus String? @map("kinsect_bonus") // 猎虫奖励类型
+  
+  // 制作相关
+  craftingCost Int @default(0) @map("crafting_cost")
+  upgradeCost  Int @default(0) @map("upgrade_cost")
+  
+  // 图像资源
+  iconUrl   String? @map("icon_url")
+  imageUrl  String? @map("image_url")
+  
+  // 时间戳
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // 关系
+  materials      WeaponMaterial[]
+  skills         WeaponSkill[]
+  upgradeFrom    Weapon?          @relation("WeaponUpgrade", fields: [upgradeFromId], references: [id])
+  upgradeFromId  Int?             @map("upgrade_from_id")
+  upgradeTo      Weapon[]         @relation("WeaponUpgrade")
+  series         WeaponSeries?    @relation(fields: [seriesId], references: [id])
+  seriesId       Int?             @map("series_id")
+  
+  @@index([gameId])
+  @@index([weaponType])
+  @@index([rarity])
+  @@index([rawAttack])
+  @@index([nameEn])
+  @@map("weapons")
+}
+
+// 删除已重构的旧模型，使用上面新的领域驱动模型
+
+
+
+// === 辅助数据模型 ===
+
+// 防具升级数据
+model ArmorUpgrade {
+  id      Int @id @default(autoincrement())
+  rarity  Int @unique
+  
+  steps   String // 升级步骤数据 JSON (嵌入式)
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([rarity])
+  @@map("armor_upgrades")
+}
+
+// 物种系统
+model Species {
+  id    Int    @id @default(autoincrement())
+  kind  String @unique // "flying-wyvern", "fish", "herbivore", etc.
+  
+  names String   // 多语言名称 JSON
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([kind])
+  @@map("species")
+}
+
+// 舞台/地图系统
+model Stage {
+  id      Int    @id @default(autoincrement())
+  game_id BigInt @unique
+  
+  names   String   // 多语言名称 JSON
+  areas   Int    @default(0) // 区域数量
+  
+  camps   String?  // 营地数据 JSON (嵌入式)
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([game_id])
+  @@index([areas])
+  @@map("stages")
+}
+
+// 狩猎笛专用数据
+model HuntingHornMelody {
+  id      Int  @id @default(autoincrement())
+  game_id Int  @unique
+  
+  notes   String // 音符数组 JSON ["white", "red", "blue"]
+  songs   String // 歌曲ID数组 JSON [1, 11, 15, 33, 46, 48]
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([game_id])
+  @@map("hunting_horn_melodies")
+}
+
+model HuntingHornSong {
+  id        Int @id @default(autoincrement())
+  effect_id Int @unique
+  
+  notes String // 音符组合 JSON ["purple", "purple"]
+  names String // 多语言名称 JSON
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([effect_id])
+  @@map("hunting_horn_songs")
+}
+
+// 部位名称数据
+model PartName {
+  id      Int    @id @default(autoincrement())
+  game_id BigInt @unique
+  
+  names String // 多语言名称 JSON
+  
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  
+  @@index([game_id])
+  @@map("part_names")
 }

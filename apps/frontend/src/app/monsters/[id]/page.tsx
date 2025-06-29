@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { ErrorMessage } from '../../../components/ErrorMessage';
 
-const GET_MONSTER_BY_ID = gql`
-  query GetMonsterById($id: ID!) {
-    monster(id: $id) {
+const GET_MONSTER_WITH_REWARDS = gql`
+  query GetMonsterWithRewards($id: ID!) {
+    monsterWithRewards(id: $id) {
       id
       name
       description
@@ -53,7 +53,7 @@ interface Monster {
 }
 
 interface MonsterData {
-  monster: Monster;
+  monsterWithRewards: Monster;
 }
 
 export default function MonsterDetailPage() {
@@ -61,14 +61,14 @@ export default function MonsterDetailPage() {
   const router = useRouter();
   const id = params.id as string;
 
-  const { loading, error, data } = useQuery<MonsterData>(GET_MONSTER_BY_ID, {
+  const { loading, error, data } = useQuery<MonsterData>(GET_MONSTER_WITH_REWARDS, {
     variables: { id },
     skip: !id,
   });
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error.message} />;
-  if (!data?.monster) {
+  if (!data?.monsterWithRewards) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -85,7 +85,7 @@ export default function MonsterDetailPage() {
     );
   }
 
-  const monster = data.monster;
+  const monster = data.monsterWithRewards;
 
   return (
     <div className="container mx-auto px-4 py-8">

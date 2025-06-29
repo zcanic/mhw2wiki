@@ -2,6 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type EnhancedItem {
+  category: String!
+  description: String
+  id: ID!
+  name: String!
+  rarity: Float!
+  sources: [ItemSource!]
+  usages: [ItemUsage!]
+  value: Float!
+}
+
+type EnhancedWeapon {
+  attack: Int!
+  description: String
+  element: String
+  id: String!
+  materials: [WeaponMaterial!]
+  name: String!
+  rarity: Int!
+  type: String!
+  upgrades: [WeaponUpgrade!]
+  weaponTree: String
+}
+
 type Item {
   category: String!
   description: String
@@ -9,6 +33,19 @@ type Item {
   name: String!
   rarity: Float!
   value: Float!
+}
+
+type ItemSource {
+  dropRate: Float!
+  method: String!
+  monsterName: String!
+  rank: String
+}
+
+type ItemUsage {
+  itemName: String!
+  quantity: Float!
+  type: String!
 }
 
 type Monster {
@@ -34,21 +71,30 @@ type MonsterReward {
 }
 
 type Query {
+  habitatsForMonster(monsterId: ID!): [String!]!
   health: String!
   item(id: ID!): Item
+  itemWithSources(id: ID!): EnhancedItem
   items: [Item!]!
   itemsByCategory(category: String!): [Item!]!
+  itemsByMonster(monsterId: ID!): [Item!]!
   itemsByRarity(rarity: Int!): [Item!]!
+  itemsByWeapon(weaponId: ID!): [Item!]!
   monster(id: ID!): Monster
+  monsterWithRewards(id: ID!): Monster
   monsters: [Monster!]!
+  monstersByDroppedItem(itemName: String!): [Monster!]!
   monstersByLocation(location: String!): [Monster!]!
   monstersBySpecies(species: String!): [Monster!]!
   monstersByThreatLevel(level: Int!): [Monster!]!
   searchItems(name: String!): [Item!]!
   weapon(id: ID!): Weapon
+  weaponWithMaterials(id: ID!): EnhancedWeapon
   weapons: [Weapon!]!
   weaponsByElement(element: String!): [Weapon!]!
+  weaponsByMaterial(materialName: String!): [Weapon!]!
   weaponsByRarity(rarity: Int!): [Weapon!]!
+  weaponsByTree(treeName: String!): [Weapon!]!
   weaponsByType(type: String!): [Weapon!]!
 }
 
@@ -60,4 +106,16 @@ type Weapon {
   name: String!
   rarity: Float!
   type: String!
+}
+
+type WeaponMaterial {
+  itemName: String!
+  quantity: Int!
+  rarity: Int
+}
+
+type WeaponUpgrade {
+  attack: Int!
+  level: Int!
+  materials: [WeaponMaterial!]!
 }

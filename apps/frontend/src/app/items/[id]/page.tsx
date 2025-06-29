@@ -6,18 +6,42 @@ import Link from 'next/link';
 import { LoadingSpinner } from '../../../components/LoadingSpinner';
 import { ErrorMessage } from '../../../components/ErrorMessage';
 
-const GET_ITEM_BY_ID = gql`
-  query GetItemById($id: ID!) {
-    item(id: $id) {
+const GET_ITEM_WITH_SOURCES = gql`
+  query GetItemWithSources($id: ID!) {
+    itemWithSources(id: $id) {
       id
       name
       description
       category
       rarity
       value
+      sources {
+        monsterName
+        method
+        dropRate
+        rank
+      }
+      usages {
+        type
+        itemName
+        quantity
+      }
     }
   }
 `;
+
+interface ItemSource {
+  monsterName: string;
+  method: string;
+  dropRate: number;
+  rank?: string;
+}
+
+interface ItemUsage {
+  type: string;
+  itemName: string;
+  quantity: number;
+}
 
 interface Item {
   id: string;
@@ -26,10 +50,12 @@ interface Item {
   category: string;
   rarity: number;
   value: number;
+  sources?: ItemSource[];
+  usages?: ItemUsage[];
 }
 
 interface ItemData {
-  item: Item;
+  itemWithSources: Item;
 }
 
 const CATEGORY_COLORS: { [key: string]: string } = {
@@ -53,14 +79,14 @@ export default function ItemDetailPage() {
   const router = useRouter();
   const id = params.id as string;
 
-  const { loading, error, data } = useQuery<ItemData>(GET_ITEM_BY_ID, {
+  const { loading, error, data } = useQuery<ItemData>(GET_ITEM_WITH_SOURCES, {
     variables: { id },
     skip: !id,
   });
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error.message} />;
-  if (!data?.item) {
+  if (!data?.itemWithSources) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -77,7 +103,7 @@ export default function ItemDetailPage() {
     );
   }
 
-  const item = data.item;
+  const item = data.itemWithSources;
   const categoryColorClass = CATEGORY_COLORS[item.category] || 'from-gray-500 to-gray-700';
   const categoryIcon = CATEGORY_ICONS[item.category] || '📦';
 
@@ -210,23 +236,69 @@ export default function ItemDetailPage() {
           </div>
         </div>
 
-        {/* Acquisition (placeholder) */}
+        {/* Sources */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">获取方式</h3>
-          <div className="space-y-2">
-            <div className="text-sm text-gray-500 italic">
-              获取方式信息将在后续版本中提供
+          {item.sources && item.sources.length > 0 ? (
+            <div className="space-y-3">
+              {item.sources.map((source: ItemSource, index: number) => (
+                <div
+                  key={index}
+                  className="flex flex-col p-3 bg-green-50 border border-green-200 rounded-lg"
+                >
+                  <div className="flex items-center mb-2">
+                    <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12l-2-2m0 0l-2-2m2 2l2-2m-2 2l2 2" />
+                    </svg>
+                    <span className="text-sm font-medium text-green-800">{source.monsterName}</span>
+                  </div>
+                  <div className="text-xs text-green-600 space-y-1">
+                    <div>方式: {source.method}</div>
+                    <div>概率: {source.dropRate}%</div>
+                    {source.rank && <div>等级: {source.rank}</div>}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-sm text-gray-500 italic">
+              该物品的获取方式信息尚不可用
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Related Items (placeholder) */}
+      {/* Usages */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">相关物品</h3>
-        <div className="text-sm text-gray-500 italic">
-          相关物品推荐将在后续版本中提供
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">用途</h3>
+        {item.usages && item.usages.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {item.usages.map((usage: ItemUsage, index: number) => (
+              <div
+                key={index}
+                className="flex flex-col p-3 bg-blue-50 border border-blue-200 rounded-lg"
+              >
+                <div className="flex items-center mb-2">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 ${
+                    usage.type === 'weapon' ? 'bg-red-500' :
+                    usage.type === 'armor' ? 'bg-blue-500' : 'bg-purple-500'
+                  }`}>
+                    {usage.type === 'weapon' ? '⚔️' : usage.type === 'armor' ? '🛡️' : '⬆️'}
+                  </div>
+                  <span className="text-sm font-medium text-blue-800">{usage.itemName}</span>
+                </div>
+                <div className="text-xs text-blue-600 space-y-1">
+                  <div>类型: {usage.type === 'weapon' ? '武器' : usage.type === 'armor' ? '防具' : '升级'}</div>
+                  <div>需要数量: {usage.quantity}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-gray-500 italic">
+            该物品的用途信息尚不可用
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}

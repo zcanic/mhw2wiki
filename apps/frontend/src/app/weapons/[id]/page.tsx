@@ -8,7 +8,7 @@ import { ErrorMessage } from '../../../components/ErrorMessage';
 
 const GET_WEAPON_BY_ID = gql`
   query GetWeaponById($id: ID!) {
-    weapon(id: $id) {
+    weaponWithMaterials(id: $id) {
       id
       name
       description
@@ -16,9 +16,35 @@ const GET_WEAPON_BY_ID = gql`
       attack
       rarity
       element
+      materials {
+        itemName
+        quantity
+        rarity
+      }
+      upgrades {
+        level
+        attack
+        materials {
+          itemName
+          quantity
+        }
+      }
+      weaponTree
     }
   }
 `;
+
+interface WeaponMaterial {
+  itemName: string;
+  quantity: number;
+  rarity?: number;
+}
+
+interface WeaponUpgrade {
+  level: number;
+  attack: number;
+  materials: WeaponMaterial[];
+}
 
 interface Weapon {
   id: string;
@@ -28,10 +54,13 @@ interface Weapon {
   attack: number;
   rarity: number;
   element?: string;
+  materials?: WeaponMaterial[];
+  upgrades?: WeaponUpgrade[];
+  weaponTree?: string;
 }
 
 interface WeaponData {
-  weapon: Weapon;
+  weaponWithMaterials: Weapon;
 }
 
 const WEAPON_TYPE_COLORS: { [key: string]: string } = {
@@ -71,7 +100,7 @@ export default function WeaponDetailPage() {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error.message} />;
-  if (!data?.weapon) {
+  if (!data?.weaponWithMaterials) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -88,7 +117,7 @@ export default function WeaponDetailPage() {
     );
   }
 
-  const weapon = data.weapon;
+  const weapon = data.weaponWithMaterials;
   const typeColorClass = WEAPON_TYPE_COLORS[weapon.type] || 'from-gray-500 to-gray-700';
   const elementColorClass = weapon.element ? ELEMENT_COLORS[weapon.element] || 'bg-gray-100 text-gray-800' : '';
 
@@ -172,6 +201,17 @@ export default function WeaponDetailPage() {
               </div>
             )}
 
+            {weapon.weaponTree && (
+              <div className="mb-4">
+                <span className="text-sm font-medium text-gray-500">武器树</span>
+                <div className="mt-1">
+                  <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                    {weapon.weaponTree}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {weapon.description && (
               <div>
                 <span className="text-sm font-medium text-gray-500">描述</span>
@@ -222,16 +262,59 @@ export default function WeaponDetailPage() {
           </div>
         </div>
 
-        {/* Upgrade Materials (placeholder) */}
+        {/* Upgrade Materials */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">强化材料</h3>
-          <div className="space-y-2">
-            <div className="text-sm text-gray-500 italic">
-              强化材料信息将在后续版本中提供
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">制作材料</h3>
+          {weapon.materials && weapon.materials.length > 0 ? (
+            <div className="space-y-2">
+              {weapon.materials.map((material: WeaponMaterial, index: number) => (
+                <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-sm font-medium">{material.itemName}</span>
+                  <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    x{material.quantity}
+                  </span>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-sm text-gray-500 italic">
+              制作材料信息将在后续版本中提供
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Weapon Upgrades */}
+      {weapon.upgrades && weapon.upgrades.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">强化路径</h3>
+          <div className="space-y-4">
+            {weapon.upgrades.map((upgrade: WeaponUpgrade, index: number) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-medium text-gray-900">等级 {upgrade.level}</span>
+                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">
+                    攻击力: {upgrade.attack}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <span className="text-sm font-medium text-gray-500">所需材料:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {upgrade.materials.map((material: WeaponMaterial, matIndex: number) => (
+                      <div key={matIndex} className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+                        <span>{material.itemName}</span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          x{material.quantity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4">
