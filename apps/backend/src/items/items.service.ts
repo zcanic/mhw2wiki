@@ -8,7 +8,7 @@ export class ItemsService {
 
   async findAll(): Promise<Item[]> {
     const items = await this.prisma.item.findMany({
-      orderBy: { names: 'asc' },
+      orderBy: { nameEn: 'asc' },
     });
     
     return items.map(item => this.transformToItem(item));
@@ -25,8 +25,8 @@ export class ItemsService {
 
   async findByCategory(category: string): Promise<Item[]> {
     const items = await this.prisma.item.findMany({
-      where: { kind: category.toLowerCase() },
-      orderBy: { names: 'asc' },
+      where: { category: category as any },
+      orderBy: { nameEn: 'asc' },
     });
     
     return items.map(item => this.transformToItem(item));
@@ -35,7 +35,7 @@ export class ItemsService {
   async findByRarity(rarity: number): Promise<Item[]> {
     const items = await this.prisma.item.findMany({
       where: { rarity },
-      orderBy: { names: 'asc' },
+      orderBy: { nameEn: 'asc' },
     });
     
     return items.map(item => this.transformToItem(item));
@@ -43,7 +43,7 @@ export class ItemsService {
 
   async searchByName(name: string): Promise<Item[]> {
     const items = await this.prisma.item.findMany({
-      orderBy: { names: 'asc' },
+      orderBy: { nameEn: 'asc' },
     });
     
     // Filter by name after fetching since SQLite doesn't have great JSON search
@@ -55,14 +55,13 @@ export class ItemsService {
   }
 
   private transformToItem(dbItem: any): Item {
-    const names = JSON.parse(dbItem.names);
     return {
       id: dbItem.id.toString(),
-      name: names.en || names.ja || 'Unknown',
-      category: dbItem.kind,
-      description: `${names.en || names.ja} - ${dbItem.kind}`,
-      rarity: dbItem.rarity,
-      value: 0 // 使用默认值，不假设任何计算逻辑
+      name: dbItem.nameEn || dbItem.nameJa || 'Unknown',
+      category: dbItem.category || 'Unknown',
+      description: dbItem.descriptionEn || dbItem.descriptionJa || 'No description available',
+      rarity: dbItem.rarity || 1,
+      value: dbItem.value || 0
     };
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { gql, useQuery } from '@apollo/client';
+import { useState, useMemo } from 'react';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorMessage } from '../../components/ErrorMessage';
 
@@ -36,6 +37,65 @@ interface MonstersData {
 
 export default function MonstersPage() {
   const { loading, error, data } = useQuery<MonstersData>(GET_MONSTERS);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSpecies, setSelectedSpecies] = useState('');
+  const [selectedHabitat, setSelectedHabitat] = useState('');
+  const [threatLevelRange, setThreatLevelRange] = useState<[number, number]>([1, 10]);
+
+  // Extract unique values for dropdowns
+  const { species, habitats } = useMemo(() => {
+    if (!data?.monsters) return { species: [], habitats: [] };
+    
+    const speciesSet = new Set(data.monsters.map(m => m.species).filter(Boolean));
+    const habitatsSet = new Set(data.monsters.map(m => m.habitat).filter(Boolean));
+    
+    return {
+      species: Array.from(speciesSet).sort(),
+      habitats: Array.from(habitatsSet).sort()
+    };
+  }, [data?.monsters]);
+
+  // Apply filters to data
+  const filteredMonsters = useMemo(() => {
+    if (!data?.monsters) return [];
+    
+    return data.monsters.filter(monster => {
+      // Search filter
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch = 
+          monster.name.toLowerCase().includes(searchLower) ||
+          monster.description.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+      
+      // Species filter
+      if (selectedSpecies && monster.species !== selectedSpecies) {
+        return false;
+      }
+      
+      // Habitat filter
+      if (selectedHabitat && monster.habitat !== selectedHabitat) {
+        return false;
+      }
+      
+      // Threat level filter
+      if (monster.threatLevel < threatLevelRange[0] || monster.threatLevel > threatLevelRange[1]) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [data?.monsters, searchTerm, selectedSpecies, selectedHabitat, threatLevelRange]);
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSelectedSpecies('');
+    setSelectedHabitat('');
+    setThreatLevelRange([1, 10]);
+  };
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error.message} />;
@@ -51,8 +111,106 @@ export default function MonstersPage() {
         </p>
       </header>
 
+      {/* Filter Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">筛选条件</h2>
+          <button
+            onClick={resetFilters}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          >
+            重置筛选
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Search */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              搜索
+            </label>
+            <input
+              type="text"
+              placeholder="搜索怪物名称或描述..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {/* Species */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              种族
+            </label>
+            <select
+              value={selectedSpecies}
+              onChange={(e) => setSelectedSpecies(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">所有种族</option>
+              {species.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Habitat */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              栖息地
+            </label>
+            <select
+              value={selectedHabitat}
+              onChange={(e) => setSelectedHabitat(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">所有栖息地</option>
+              {habitats.map(h => (
+                <option key={h} value={h}>{h}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Threat Level */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              威胁等级: {threatLevelRange[0]} - {threatLevelRange[1]}
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={threatLevelRange[0]}
+                onChange={(e) => setThreatLevelRange([parseInt(e.target.value), threatLevelRange[1]])}
+                className="flex-1"
+              />
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={threatLevelRange[1]}
+                onChange={(e) => setThreatLevelRange([threatLevelRange[0], parseInt(e.target.value)])}
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Results Info */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-sm text-gray-600">
+            显示 {filteredMonsters.length} 个怪物
+            {data?.monsters && filteredMonsters.length !== data.monsters.length && 
+              ` (共 ${data.monsters.length} 个)`
+            }
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {data?.monsters.map((monster) => (
+        {filteredMonsters.map((monster) => (
           <div
             key={monster.id}
             className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
@@ -88,6 +246,24 @@ export default function MonstersPage() {
           </div>
         ))}
       </div>
+
+      {filteredMonsters.length === 0 && data?.monsters && data.monsters.length > 0 && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔍</div>
+          <h2 className="text-2xl font-bold text-gray-600 mb-2">
+            没有找到符合条件的怪物
+          </h2>
+          <p className="text-gray-500 mb-4">
+            请尝试调整筛选条件或重置筛选
+          </p>
+          <button
+            onClick={resetFilters}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            重置筛选
+          </button>
+        </div>
+      )}
 
       {(!data?.monsters || data.monsters.length === 0) && (
         <div className="text-center py-12">

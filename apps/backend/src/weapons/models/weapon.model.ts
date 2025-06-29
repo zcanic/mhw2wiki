@@ -70,6 +70,12 @@ export class Weapon extends BaseEntity {
   @Field(() => WeaponType)
   weaponType: WeaponType;
 
+  // Alias for frontend compatibility
+  @Field(() => String)
+  get type(): string {
+    return this.weaponType;
+  }
+
   @Field(() => Int)
   rarity: number;
 

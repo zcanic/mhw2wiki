@@ -59,6 +59,42 @@ registerEnumType(ThreatLevel, {
 });
 
 @ObjectType()
+export class Stage {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => Int)
+  gameId: number;
+
+  @Field()
+  nameEn: string;
+
+  @Field()
+  nameJa: string;
+
+  @Field({ nullable: true })
+  nameZh?: string;
+
+  @Field(() => Int)
+  areas: number;
+
+  @Field({ nullable: true })
+  basecamp?: string;
+
+  @Field({ nullable: true })
+  climate?: string;
+
+  @Field({ nullable: true })
+  ecosystem?: string;
+
+  @Field({ nullable: true })
+  mapUrl?: string;
+
+  @Field({ nullable: true })
+  imageUrl?: string;
+}
+
+@ObjectType()
 export class LargeMonster extends BaseEntity {
   @Field(() => Int)
   gameId: number;
@@ -196,42 +232,6 @@ export class MonsterReward {
 
   @Field(() => Item)
   item: Item;
-}
-
-@ObjectType()
-export class Stage {
-  @Field(() => Int)
-  id: number;
-
-  @Field(() => Int)
-  gameId: number;
-
-  @Field()
-  nameEn: string;
-
-  @Field()
-  nameJa: string;
-
-  @Field({ nullable: true })
-  nameZh?: string;
-
-  @Field(() => Int)
-  areas: number;
-
-  @Field({ nullable: true })
-  basecamp?: string;
-
-  @Field({ nullable: true })
-  climate?: string;
-
-  @Field({ nullable: true })
-  ecosystem?: string;
-
-  @Field({ nullable: true })
-  mapUrl?: string;
-
-  @Field({ nullable: true })
-  imageUrl?: string;
 }
 
 @ObjectType()
