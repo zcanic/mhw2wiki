@@ -3,6 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorMessage } from '../../components/ErrorMessage';
 
@@ -30,27 +31,38 @@ interface Item {
 
 function ItemCard({ item }: { item: Item }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-xl font-bold text-gray-800">{item.name}</h3>
-        <span className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded">
-          {item.category}
-        </span>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 mb-3">
-        <div>
-          <span className="text-sm text-gray-600">价值</span>
-          <p className="text-lg font-semibold text-green-600">{item.value}z</p>
+    <Link href={`/items/${item.id}`} className="block group">
+      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group-hover:shadow-xl group-hover:scale-105 transition-transform">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{item.name}</h3>
+          <span className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded">
+            {item.category}
+          </span>
         </div>
-        <div>
-          <span className="text-sm text-gray-600">稀有度</span>
-          <p className="text-lg font-semibold text-yellow-600">★{item.rarity}</p>
+        
+        <div className="grid grid-cols-2 gap-4 mb-3">
+          <div>
+            <span className="text-sm text-gray-600">价值</span>
+            <p className="text-lg font-semibold text-green-600">{item.value}z</p>
+          </div>
+          <div>
+            <span className="text-sm text-gray-600">稀有度</span>
+            <p className="text-lg font-semibold text-yellow-600">★{item.rarity}</p>
+          </div>
+        </div>
+        
+        {item.description && (
+          <p className="text-sm text-gray-600 mb-3">{item.description}</p>
+        )}
+        
+        <div className="flex items-center text-blue-600 group-hover:text-blue-800 transition-colors">
+          <span className="text-sm font-medium">查看详情</span>
+          <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </div>
       </div>
-      
-      <p className="text-sm text-gray-600">{item.description}</p>
-    </div>
+    </Link>
   );
 }
 

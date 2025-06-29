@@ -3,6 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ErrorMessage } from '../../components/ErrorMessage';
 
@@ -14,6 +15,7 @@ const GET_WEAPONS = gql`
       type
       attack
       rarity
+      element
       description
     }
   }
@@ -25,34 +27,52 @@ interface Weapon {
   type: string;
   attack: number;
   rarity: number;
+  element?: string;
   description?: string;
 }
 
 function WeaponCard({ weapon }: { weapon: Weapon }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="text-xl font-bold text-gray-800">{weapon.name}</h3>
-        <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-          {weapon.type}
-        </span>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 mb-3">
-        <div>
-          <span className="text-sm text-gray-600">攻击力</span>
-          <p className="text-lg font-semibold text-red-600">{weapon.attack}</p>
+    <Link href={`/weapons/${weapon.id}`} className="block group">
+      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group-hover:shadow-xl group-hover:scale-105 transition-transform">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{weapon.name}</h3>
+          <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            {weapon.type}
+          </span>
         </div>
-        <div>
-          <span className="text-sm text-gray-600">稀有度</span>
-          <p className="text-lg font-semibold text-yellow-600">★{weapon.rarity}</p>
+        
+        <div className="grid grid-cols-2 gap-4 mb-3">
+          <div>
+            <span className="text-sm text-gray-600">攻击力</span>
+            <p className="text-lg font-semibold text-red-600">{weapon.attack}</p>
+          </div>
+          <div>
+            <span className="text-sm text-gray-600">稀有度</span>
+            <p className="text-lg font-semibold text-yellow-600">★{weapon.rarity}</p>
+          </div>
+        </div>
+        
+        {weapon.element && (
+          <div className="mb-3">
+            <span className="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded">
+              {weapon.element}属性
+            </span>
+          </div>
+        )}
+        
+        {weapon.description && (
+          <p className="text-sm text-gray-600 mb-3">{weapon.description}</p>
+        )}
+        
+        <div className="flex items-center text-blue-600 group-hover:text-blue-800 transition-colors">
+          <span className="text-sm font-medium">查看详情</span>
+          <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </div>
       </div>
-      
-      {weapon.description && (
-        <p className="text-sm text-gray-600">{weapon.description}</p>
-      )}
-    </div>
+    </Link>
   );
 }
 
