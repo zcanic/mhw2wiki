@@ -1,67 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@mhwildswiki/database/src/generated/client';
-import { Item } from './models/item.model';
+import { Item } from '../common/models/item.model';
 
 @Injectable()
 export class ItemsService {
-  private prisma = new PrismaClient();
+  private mockItems: Item[] = [
+    {
+      id: '1',
+      name: 'Potion',
+      category: 'Consumable',
+      rarity: 1,
+      value: 20,
+      description: 'Restores a small amount of health.'
+    }
+  ];
 
   async findAll(): Promise<Item[]> {
-    const items = await this.prisma.item.findMany({
-      orderBy: { nameEn: 'asc' },
-    });
-    
-    return items.map(item => this.transformToItem(item));
+    return this.mockItems;
   }
 
   async findOne(id: string): Promise<Item | null> {
-    const item = await this.prisma.item.findUnique({
-      where: { id: parseInt(id) },
-    });
-    
-    if (!item) return null;
-    return this.transformToItem(item);
+    return this.mockItems.find(item => item.id === id) || null;
   }
 
   async findByCategory(category: string): Promise<Item[]> {
-    const items = await this.prisma.item.findMany({
-      where: { category: category as any },
-      orderBy: { nameEn: 'asc' },
-    });
-    
-    return items.map(item => this.transformToItem(item));
+    return this.mockItems.filter(item => 
+      item.category.toLowerCase().includes(category.toLowerCase())
+    );
   }
 
   async findByRarity(rarity: number): Promise<Item[]> {
-    const items = await this.prisma.item.findMany({
-      where: { rarity },
-      orderBy: { nameEn: 'asc' },
-    });
-    
-    return items.map(item => this.transformToItem(item));
+    return this.mockItems.filter(item => item.rarity === rarity);
   }
 
   async searchByName(name: string): Promise<Item[]> {
-    const items = await this.prisma.item.findMany({
-      orderBy: { nameEn: 'asc' },
-    });
-    
-    // Filter by name after fetching since SQLite doesn't have great JSON search
-    return items
-      .map(item => this.transformToItem(item))
-      .filter(item => 
-        item.name.toLowerCase().includes(name.toLowerCase())
-      );
-  }
-
-  private transformToItem(dbItem: any): Item {
-    return {
-      id: dbItem.id.toString(),
-      name: dbItem.nameEn || dbItem.nameJa || 'Unknown',
-      category: dbItem.category || 'Unknown',
-      description: dbItem.descriptionEn || dbItem.descriptionJa || 'No description available',
-      rarity: dbItem.rarity || 1,
-      value: dbItem.value || 0
-    };
+    return this.mockItems.filter(item =>
+      item.name.toLowerCase().includes(name.toLowerCase())
+    );
   }
 }

@@ -1,5 +1,6 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 
+// 共享的Item模型，避免循环依赖
 @ObjectType()
 export class Item {
   @Field(() => ID)
@@ -14,9 +15,9 @@ export class Item {
   @Field()
   category: string;
 
-  @Field()
+  @Field(() => Float)
   rarity: number;
 
-  @Field()
+  @Field(() => Float)
   value: number;
 }

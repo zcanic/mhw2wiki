@@ -1,5 +1,5 @@
 import { Resolver, Query, Args, ID, Int } from '@nestjs/graphql';
-import { Item } from './models/item.model';
+import { Item } from '../common/models/item.model';
 import { ItemsService } from './items.service';
 
 @Resolver(() => Item)
