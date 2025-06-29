@@ -2,16 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type ArmorPiece {
-  armorSet: String!
-  defense: Float!
-  description: String
-  id: ID!
-  name: String!
-  rarity: Float!
-  type: String!
-}
-
 type Item {
   category: String!
   description: String
@@ -44,11 +34,7 @@ type MonsterReward {
 }
 
 type Query {
-  armorPiece(id: ID!): ArmorPiece
-  armorPieces: [ArmorPiece!]!
-  armorPiecesByRarity(rarity: Int!): [ArmorPiece!]!
-  armorPiecesBySet(armorSet: String!): [ArmorPiece!]!
-  armorPiecesByType(type: String!): [ArmorPiece!]!
+  health: String!
   item(id: ID!): Item
   items: [Item!]!
   itemsByCategory(category: String!): [Item!]!

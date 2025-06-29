@@ -3,9 +3,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { HealthResolver } from './health.resolver';
-import { MonstersModule } from './monsters/monsters.module';
-import { WeaponsModule } from './weapons/weapons.module';
-import { ItemsModule } from './items/items.module';
 
 @Module({
   imports: [
@@ -16,9 +13,6 @@ import { ItemsModule } from './items/items.module';
       playground: true,
       introspection: true,
     }),
-    MonstersModule,
-    WeaponsModule,
-    ItemsModule,
   ],
   providers: [HealthResolver],
 })
