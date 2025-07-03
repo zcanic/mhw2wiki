@@ -157,7 +157,9 @@ async function clearDatabase(): Promise<void> {
   
   for (const table of tables) {
     try {
-      await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`);
+      // SQLite不支持TRUNCATE，使用DELETE代替
+      await prisma.$executeRawUnsafe(`DELETE FROM "${table}";`);
+      await prisma.$executeRawUnsafe(`DELETE FROM sqlite_sequence WHERE name='${table}';`);
       logger.info(`清理表: ${table}`);
     } catch (error) {
       logger.warn(`清理表失败: ${table}`, error);
@@ -175,8 +177,8 @@ async function importItems(): Promise<void> {
     await prisma.item.createMany({
       data: batch.map((item: any) => ({
         game_id: BigInt(item.game_id),
-        names: item.names,
-        descriptions: item.descriptions || null,
+        names: JSON.stringify(item.names),
+        descriptions: item.descriptions ? JSON.stringify(item.descriptions) : null,
         kind: item.kind || 'unknown',
         rarity: item.rarity || 0,
         max_count: item.max_count || 0,
@@ -196,9 +198,9 @@ async function importSkills(): Promise<void> {
     await prisma.skill.createMany({
       data: batch.map((skill: any) => ({
         game_id: BigInt(skill.game_id),
-        names: skill.names,
-        descriptions: skill.descriptions || null,
-        ranks: skill.ranks || [],
+        names: JSON.stringify(skill.names),
+        descriptions: skill.descriptions ? JSON.stringify(skill.descriptions) : null,
+        ranks: JSON.stringify(skill.ranks || []),
       })),
       skipDuplicates: true,
     });
@@ -213,11 +215,11 @@ async function importMonsters(): Promise<void> {
     await prisma.monster.createMany({
       data: batch.map((monster: any) => ({
         game_id: BigInt(monster.game_id),
-        names: monster.names,
-        descriptions: monster.descriptions || null,
-        features: monster.features || null,
+        names: JSON.stringify(monster.names),
+        descriptions: monster.descriptions ? JSON.stringify(monster.descriptions) : null,
+        features: monster.features ? JSON.stringify(monster.features) : null,
         species: monster.species || null,
-        parts: monster.parts || null,
+        parts: monster.parts ? JSON.stringify(monster.parts) : null,
         rewards: monster.rewards || null,
       })),
       skipDuplicates: true,
@@ -350,9 +352,9 @@ async function importPartNames(): Promise<void> {
   
   await batchInsert('PartName', partNames, async (batch) => {
     await prisma.partName.createMany({
-      data: batch.map((partName: any) => ({
-        game_id: BigInt(partName.game_id),
-        names: partName.names,
+      data: batch.map((partName: any, index: number) => ({
+        game_id: BigInt(index + 1), // 使用索引作为game_id，因为原始数据没有game_id
+        names: JSON.stringify(partName.names),
       })),
       skipDuplicates: true,
     });

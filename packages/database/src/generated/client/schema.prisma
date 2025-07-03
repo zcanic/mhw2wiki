@@ -1,4 +1,4 @@
-// MHWildsWiki - SQLite Compatible Schema v1.0
+// MHWildsWiki - JSON-Compatible Schema v3.0
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/client"
@@ -9,63 +9,239 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model LargeMonster {
-  id          Int      @id @default(autoincrement())
-  gameId      String   @unique @map("game_id")
-  nameEn      String   @map("name_en")
-  nameJa      String   @map("name_ja")
-  nameZh      String?  @map("name_zh")
-  monsterType String   @map("monster_type")
-  threatLevel String   @map("threat_level")
-  elements    String   @default("")
-  weaknesses  String   @default("")
-  iconUrl     String?  @map("icon_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+// === 核心数据模型 ===
 
-  @@index([gameId])
-  @@map("large_monsters")
-}
-
-model Weapon {
-  id            Int      @id @default(autoincrement())
-  gameId        String   @unique @map("game_id")
-  nameEn        String   @map("name_en")
-  nameJa        String   @map("name_ja")
-  nameZh        String?  @map("name_zh")
-  weaponType    String   @map("weapon_type")
-  rarity        Int      @default(1)
-  attack        Int      @default(0)
-  elementType   String?  @map("element_type")
-  elementDamage Int?     @map("element_damage")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  @@index([gameId])
-  @@map("weapons")
-}
-
+// 物品数据
 model Item {
-  id        Int      @id @default(autoincrement())
-  gameId    String   @unique @map("game_id")
-  nameEn    String   @map("name_en")
-  nameJa    String   @map("name_ja")
-  nameZh    String?  @map("name_zh")
-  category  String
-  rarity    Int      @default(1)
-  value     Int      @default(0)
-  iconUrl   String?  @map("icon_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  game_id      BigInt   @unique
+  names        String // JSON: MultiLanguageText
+  descriptions String? // JSON: MultiLanguageText
+  kind         String?
+  rarity       Int      @default(0)
+  max_count    Int      @default(0)
+  sell_price   Int      @default(0)
+  buy_price    Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  @@index([gameId])
+  @@index([game_id])
+  @@index([kind])
   @@map("items")
 }
 
-model Monster {
-  id      Int    @id @default(autoincrement())
-  game_id String @unique
-  data    String
+// 技能数据
+model Skill {
+  id           Int      @id @default(autoincrement())
+  game_id      BigInt   @unique
+  names        String // JSON: MultiLanguageText
+  descriptions String? // JSON: MultiLanguageText
+  ranks        String // JSON: Array of skill ranks
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
+  @@index([game_id])
+  @@map("skills")
+}
+
+// 怪物数据
+model Monster {
+  id           Int      @id @default(autoincrement())
+  game_id      BigInt   @unique
+  names        String // JSON: MultiLanguageText
+  descriptions String? // JSON: MultiLanguageText
+  features     String? // JSON: Monster features
+  species      String?
+  parts        String? // JSON: Monster parts
+  rewards      String? // JSON: Reward data
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@index([species])
   @@map("monsters")
+}
+
+// 武器数据
+model Weapon {
+  id             Int      @id @default(autoincrement())
+  game_id        BigInt   @unique
+  kind           String // weapon type: great-sword, long-sword, etc.
+  names          String // JSON: MultiLanguageText
+  descriptions   String? // JSON: MultiLanguageText
+  rarity         Int?
+  attack_raw     Int?
+  affinity       Int?
+  defense        Int?
+  slots          String? // JSON: Slot data
+  sharpness      String? // JSON: Sharpness data
+  handicraft     String? // JSON: Handicraft levels
+  element_type   String?
+  element_damage Int?
+  element_hidden Boolean  @default(false)
+  ammo           String? // JSON: Ammo data for bowguns
+  coatings       String? // JSON: Coating data for bows
+  charge_levels  String? // JSON: Charge levels
+  melodies       String? // JSON: Hunting horn melodies
+  songs          String? // JSON: Hunting horn songs
+  kinsect_bonus  String? // JSON: Insect glaive kinsect bonus
+  crafting_cost  Int?
+  upgrade_cost   Int?
+  materials      String? // JSON: Required materials
+  series_id      BigInt?
+  previous_id    BigInt?
+  next_weapons   String? // JSON: Next weapon IDs
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@index([kind])
+  @@index([rarity])
+  @@map("weapons")
+}
+
+// 防具套装数据
+model ArmorSet {
+  id          Int      @id @default(autoincrement())
+  game_id     BigInt   @unique
+  names       String // JSON: MultiLanguageText
+  rarity      Int      @default(0)
+  set_bonus   String? // JSON: Set bonus data
+  group_bonus String? // JSON: Group bonus data
+  pieces      String // JSON: Array of armor pieces
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@index([rarity])
+  @@map("armor_sets")
+}
+
+// 护石数据
+model Amulet {
+  id        Int      @id @default(autoincrement())
+  game_id   BigInt   @unique
+  ranks     String // JSON: Array of amulet ranks
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@map("amulets")
+}
+
+// 饰品数据
+model Accessory {
+  id            Int      @id @default(autoincrement())
+  game_id       BigInt   @unique
+  names         String // JSON: MultiLanguageText
+  descriptions  String? // JSON: MultiLanguageText
+  rarity        Int      @default(0)
+  price         Int      @default(0)
+  level         Int      @default(0)
+  skills        String // JSON: Skill data
+  allowed_on    String   @default("weapon")
+  icon_color    String?
+  icon_color_id String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@index([rarity])
+  @@map("accessories")
+}
+
+// 护符数据
+model Charm {
+  id        Int      @id @default(autoincrement())
+  game_id   BigInt   @unique
+  names     String // JSON: MultiLanguageText
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@map("charms")
+}
+
+// 防具升级数据
+model ArmorUpgrade {
+  id        Int      @id @default(autoincrement())
+  rarity    Int      @unique
+  steps     String // JSON: Array of upgrade steps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([rarity])
+  @@map("armor_upgrades")
+}
+
+// 物种数据
+model Species {
+  id        Int      @id @default(autoincrement())
+  kind      String   @unique
+  names     String // JSON: MultiLanguageText
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([kind])
+  @@map("species")
+}
+
+// 舞台数据
+model Stage {
+  id        Int      @id @default(autoincrement())
+  game_id   BigInt   @unique
+  names     String // JSON: MultiLanguageText
+  areas     Int      @default(0)
+  camps     String? // JSON: Camp data
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@map("stages")
+}
+
+// 部位名称数据
+model PartName {
+  id        Int      @id @default(autoincrement())
+  game_id   BigInt   @unique
+  names     String // JSON: MultiLanguageText
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@map("part_names")
+}
+
+// 武器系列数据
+model WeaponSeries {
+  id        Int      @id @default(autoincrement())
+  game_id   BigInt   @unique
+  names     String // JSON: MultiLanguageText
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([game_id])
+  @@map("weapon_series")
+}
+
+// 狩猎笛旋律数据
+model HuntingHornMelody {
+  id      Int    @id @default(autoincrement())
+  game_id Int    @unique
+  notes   String // JSON: Array of notes
+  songs   String // JSON: Array of songs
+
+  @@index([game_id])
+  @@map("hunting_horn_melodies")
+}
+
+// 狩猎笛歌曲数据
+model HuntingHornSong {
+  id        Int    @id @default(autoincrement())
+  effect_id String @unique
+  notes     String // JSON: Array of notes
+  names     String // JSON: MultiLanguageText
+
+  @@index([effect_id])
+  @@map("hunting_horn_songs")
 }

@@ -119,46 +119,26 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.LargeMonsterScalarFieldEnum = {
-  id: 'id',
-  gameId: 'gameId',
-  nameEn: 'nameEn',
-  nameJa: 'nameJa',
-  nameZh: 'nameZh',
-  monsterType: 'monsterType',
-  threatLevel: 'threatLevel',
-  elements: 'elements',
-  weaknesses: 'weaknesses',
-  iconUrl: 'iconUrl',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.WeaponScalarFieldEnum = {
-  id: 'id',
-  gameId: 'gameId',
-  nameEn: 'nameEn',
-  nameJa: 'nameJa',
-  nameZh: 'nameZh',
-  weaponType: 'weaponType',
-  rarity: 'rarity',
-  attack: 'attack',
-  elementType: 'elementType',
-  elementDamage: 'elementDamage',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.ItemScalarFieldEnum = {
   id: 'id',
-  gameId: 'gameId',
-  nameEn: 'nameEn',
-  nameJa: 'nameJa',
-  nameZh: 'nameZh',
-  category: 'category',
+  game_id: 'game_id',
+  names: 'names',
+  descriptions: 'descriptions',
+  kind: 'kind',
   rarity: 'rarity',
-  value: 'value',
-  iconUrl: 'iconUrl',
+  max_count: 'max_count',
+  sell_price: 'sell_price',
+  buy_price: 'buy_price',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  descriptions: 'descriptions',
+  ranks: 'ranks',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -166,7 +146,146 @@ exports.Prisma.ItemScalarFieldEnum = {
 exports.Prisma.MonsterScalarFieldEnum = {
   id: 'id',
   game_id: 'game_id',
-  data: 'data'
+  names: 'names',
+  descriptions: 'descriptions',
+  features: 'features',
+  species: 'species',
+  parts: 'parts',
+  rewards: 'rewards',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WeaponScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  kind: 'kind',
+  names: 'names',
+  descriptions: 'descriptions',
+  rarity: 'rarity',
+  attack_raw: 'attack_raw',
+  affinity: 'affinity',
+  defense: 'defense',
+  slots: 'slots',
+  sharpness: 'sharpness',
+  handicraft: 'handicraft',
+  element_type: 'element_type',
+  element_damage: 'element_damage',
+  element_hidden: 'element_hidden',
+  ammo: 'ammo',
+  coatings: 'coatings',
+  charge_levels: 'charge_levels',
+  melodies: 'melodies',
+  songs: 'songs',
+  kinsect_bonus: 'kinsect_bonus',
+  crafting_cost: 'crafting_cost',
+  upgrade_cost: 'upgrade_cost',
+  materials: 'materials',
+  series_id: 'series_id',
+  previous_id: 'previous_id',
+  next_weapons: 'next_weapons',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ArmorSetScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  rarity: 'rarity',
+  set_bonus: 'set_bonus',
+  group_bonus: 'group_bonus',
+  pieces: 'pieces',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AmuletScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  ranks: 'ranks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AccessoryScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  descriptions: 'descriptions',
+  rarity: 'rarity',
+  price: 'price',
+  level: 'level',
+  skills: 'skills',
+  allowed_on: 'allowed_on',
+  icon_color: 'icon_color',
+  icon_color_id: 'icon_color_id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CharmScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ArmorUpgradeScalarFieldEnum = {
+  id: 'id',
+  rarity: 'rarity',
+  steps: 'steps',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SpeciesScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  names: 'names',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StageScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  areas: 'areas',
+  camps: 'camps',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PartNameScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WeaponSeriesScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  names: 'names',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.HuntingHornMelodyScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  notes: 'notes',
+  songs: 'songs'
+};
+
+exports.Prisma.HuntingHornSongScalarFieldEnum = {
+  id: 'id',
+  effect_id: 'effect_id',
+  notes: 'notes',
+  names: 'names'
 };
 
 exports.Prisma.SortOrder = {
@@ -181,10 +300,21 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  LargeMonster: 'LargeMonster',
-  Weapon: 'Weapon',
   Item: 'Item',
-  Monster: 'Monster'
+  Skill: 'Skill',
+  Monster: 'Monster',
+  Weapon: 'Weapon',
+  ArmorSet: 'ArmorSet',
+  Amulet: 'Amulet',
+  Accessory: 'Accessory',
+  Charm: 'Charm',
+  ArmorUpgrade: 'ArmorUpgrade',
+  Species: 'Species',
+  Stage: 'Stage',
+  PartName: 'PartName',
+  WeaponSeries: 'WeaponSeries',
+  HuntingHornMelody: 'HuntingHornMelody',
+  HuntingHornSong: 'HuntingHornSong'
 };
 
 /**
